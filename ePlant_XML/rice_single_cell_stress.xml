@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Oryza">
+    <view name="all" class="" db="rice_salinity_drought_ow" img="rice_template_ow.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=rice_single_cell&amp;</webservice>
+        <info>
+            <li>DRAFT / placeholder datasource: this manuscript (Robertson, Maqsood, Pasha, Provart &amp; Wilkins, in prep.) is not yet published and has not been assigned a GEO accession (the draft methods cite it as "GSExxxxxx"). <b>Every <code>sample</code> name below is a non-resolving placeholder</b> (format <code>PENDING-GEO_&lt;condition&gt;_rep&lt;n&gt;</code>) and must be replaced with the real GSM accessions once the series is deposited.</li>
+            <li>Single-nuclear RNA-seq (snRNA-seq) atlas of developing <i>Oryza sativa</i> cv. Nipponbare third leaves, comparing well-watered (WW) control against mild drought (MD), moderate drought (ModD), mild salinity (MS), and moderate salinity (ModS) treatments (10x Genomics Chromium 3&#x2019; v3.1, NovaSeq 6000, ~16,000 nuclei targeted per library).</li>
+            <li>The draft reports a total of 11 sequenced libraries across the 5 conditions but does not give a per-condition replicate breakdown in the available text (Table S1 is referenced but not included in this draft). <b>This file assumes 2 placeholder replicates per condition (10 total) as a structural default &#x2014; please correct replicate counts/names once Table S1 / the GEO submission is finalized.</b></li>
+            <li>Cell types are pseudobulk-summed nuclear counts (CPM-like: counts per cell type per condition, normalized to total counts in that cell type &#x00d7; 10,000) computed with Seurat v5, per the draft's Section 4.9 methods.</li>
+            <li>Cell-type groups below are the 10 colourable cell-type groups actually present as ids in <code>rice_template_ow.svg</code>. <b>Note:</b> the draft text states the pseudobulk eFP view uses "11 distinct mature cell types" &#x2014; only 10 are drawn in this SVG, so an 11th cell type (e.g. Procambium, mentioned elsewhere in the draft as a distinct vascular population) may be missing from the template or merged into one of the above; please reconcile with Nicholas/Sean before this goes live.</li>
+            <li><b>Tissue ids below are the literal, verbatim <code>id</code> attributes from <code>rice_template_ow.svg</code></b> (e.g. <code>Bundle.Sheath-97</code>), resolved to their condition by computing each group's path centroid and matching it to the panel quadrant carrying that condition's <code>aria-label</code> text. The Well Watered control is drawn twice in the template (once alongside the drought panels, once alongside the salinity panels) and neither of its two panels carries an <code>aria-label</code>, so both of its ids per cell type were resolved by position (left column of each row) rather than by label text &#x2014; this is the same root cause flagged earlier for why Well Watered failed to colour in the live tool, now resolved here by explicit position-based assignment.</li>
+            <li>Link URLs are placeholders (<code>PENDING_DOI_NOT_YET_PUBLISHED</code>) since no DOI exists for an unpublished manuscript; update once a preprint or accepted-article DOI is available.</li>
+        </info>
+
+        <group name="Bundle Sheath">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Bundle.Sheath" name="Bundle Sheath, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Bundle.Sheath-6" name="Bundle Sheath, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Bundle.Sheath-97" name="Bundle Sheath, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Bundle.Sheath-97-0" name="Bundle Sheath, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Bundle.Sheath-5" name="Bundle Sheath, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Bundle.Sheath-0" name="Bundle Sheath, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Epidermis">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Epidermis" name="Epidermis, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Epidermis-39" name="Epidermis, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Epidermis-3" name="Epidermis, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Epidermis-3-3" name="Epidermis, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Epidermis-1" name="Epidermis, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Epidermis-9" name="Epidermis, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Fibre">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Fibre" name="Fibre, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Fibre-08" name="Fibre, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Fibre-11" name="Fibre, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Fibre-11-8" name="Fibre, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Fibre-2" name="Fibre, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Fibre-59" name="Fibre, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Large Parenchyma">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Large.Parenchyma" name="Large Parenchyma, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Large.Parenchyma-60" name="Large Parenchyma, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Large.Parenchyma-6" name="Large Parenchyma, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Large.Parenchyma-6-0" name="Large Parenchyma, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Large.Parenchyma-1" name="Large Parenchyma, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Large.Parenchyma-4" name="Large Parenchyma, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Mesophyll">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Mesophyll" name="Mesophyll, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Mesophyll-7" name="Mesophyll, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Mesophyll-74" name="Mesophyll, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Mesophyll-74-3" name="Mesophyll, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Mesophyll-2" name="Mesophyll, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Mesophyll-0" name="Mesophyll, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Mestome Sheath">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Mestome.Sheath" name="Mestome Sheath, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Mestome.Sheath-9" name="Mestome Sheath, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Mestome.Sheath-0" name="Mestome Sheath, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Mestome.Sheath-0-2" name="Mestome Sheath, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Mestome.Sheath-4" name="Mestome Sheath, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Mestome.Sheath-18" name="Mestome Sheath, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Phloem Companion Cells">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Phloem.CC" name="Phloem Companion Cells, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Phloem.CC-70" name="Phloem Companion Cells, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Phloem.CC-7" name="Phloem Companion Cells, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Phloem.CC-7-0" name="Phloem Companion Cells, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Phloem.CC-0" name="Phloem Companion Cells, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Phloem.CC-3" name="Phloem Companion Cells, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Phloem Sieve Elements">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Phloem.SE" name="Phloem Sieve Elements, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Phloem.SE-5" name="Phloem Sieve Elements, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Phloem.SE-1" name="Phloem Sieve Elements, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Phloem.SE-1-4" name="Phloem Sieve Elements, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Phloem.SE-13" name="Phloem Sieve Elements, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Phloem.SE-6" name="Phloem Sieve Elements, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Xylem">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Xylem" name="Xylem, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Xylem-5" name="Xylem, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Xylem-7" name="Xylem, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Xylem-7-5" name="Xylem, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Xylem-0" name="Xylem, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Xylem-8" name="Xylem, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+        <group name="Xylem Parenchyma">
+            <control sample="PENDING-GEO_WW_rep1"/>
+            <control sample="PENDING-GEO_WW_rep2"/>
+            <tissue id="Xylem.Parenchyma" name="Xylem Parenchyma, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Xylem.Parenchyma-0" name="Xylem Parenchyma, Well Watered" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_WW_rep1"/>
+                <sample name="PENDING-GEO_WW_rep2"/>
+            </tissue>
+            <tissue id="Xylem.Parenchyma-7" name="Xylem Parenchyma, Mild Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MD_rep1"/>
+                <sample name="PENDING-GEO_MD_rep2"/>
+            </tissue>
+            <tissue id="Xylem.Parenchyma-7-0" name="Xylem Parenchyma, Moderate Drought" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModD_rep1"/>
+                <sample name="PENDING-GEO_ModD_rep2"/>
+            </tissue>
+            <tissue id="Xylem.Parenchyma-1" name="Xylem Parenchyma, Mild Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_MS_rep1"/>
+                <sample name="PENDING-GEO_MS_rep2"/>
+            </tissue>
+            <tissue id="Xylem.Parenchyma-26" name="Xylem Parenchyma, Moderate Salinity" colorKey="#FFFF00">
+                <link url="PENDING_DOI_NOT_YET_PUBLISHED"/>
+                <sample name="PENDING-GEO_ModS_rep1"/>
+                <sample name="PENDING-GEO_ModS_rep2"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="all" class="" db="at_flower_lee" img="at_flower_template_lee.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_flower_lee&amp;</webservice>
+        <info>
+            <li>Single-nucleus RNA-seq (snRNA-seq) data from the Arabidopsis seed-to-seed developmental atlas: Lee, Nobori, Illouz-Eliaz, Jow, Nery &amp; Ecker. <i>A Single-Nucleus Atlas of Seed-to-Seed Development in Arabidopsis</i>. <i>Nature Plants</i> (2025/2026). DOI: 10.1038/s41477-025-02072-z (preprint: bioRxiv 10.1101/2023.03.23.533992). GEO accession GSE226097.</li>
+            <li><b>No experimental condition/treatment axis applies to this organ view</b> &#x2014; nuclei were collected from a single developmental snapshot, so there is no control-vs-treatment comparison. As requested, the relative (log₂ ratio) view is instead centred on the <i>median</i> of all displayed cell-type pseudobulk means for a given gene, matching this tool's existing <code>expression_to_color_relative(median_ctrl, ...)</code> convention already used for the other Lee/Martin datasets. <code>Med_CTRL</code> is a synthetic placeholder representing that computed median, not a real GSM sample.</li>
+            <li>Tissue ids below are the literal, verbatim <code>id</code> attributes from the corresponding SVG template, confirmed with no synthetic/compound keys.</li>
+            <li>Samples used: Flowers (6 snRNA-seq runs: GSM7063668–GSM7063673). All cell types within this organ share the same set of libraries, since cell type is a post-hoc clustering annotation rather than a separate sequencing run.</li>
+        </info>
+
+        <group name="Anther">
+            <control sample="Med_CTRL"/>
+            <tissue id="Anther" name="Anther" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+        <group name="Developing ovule">
+            <control sample="Med_CTRL"/>
+            <tissue id="Developing ovule" name="Developing ovule" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+        <group name="Epidermal">
+            <control sample="Med_CTRL"/>
+            <tissue id="Epidermal" name="Epidermal" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+        <group name="Male meiocyte">
+            <control sample="Med_CTRL"/>
+            <tissue id="Male meiocyte" name="Male meiocyte" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+        <group name="Pollen">
+            <control sample="Med_CTRL"/>
+            <tissue id="Pollen" name="Pollen" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+        <group name="Tapetum">
+            <control sample="Med_CTRL"/>
+            <tissue id="Tapetum" name="Tapetum" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063668"/>
+                <sample name="GSM7063669"/>
+                <sample name="GSM7063670"/>
+                <sample name="GSM7063671"/>
+                <sample name="GSM7063672"/>
+                <sample name="GSM7063673"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

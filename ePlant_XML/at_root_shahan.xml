@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="all" class="" db="at_root_rs" img="at_root_template_shahan.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_root_rs&amp;</webservice>
+        <info>
+            <li>MVP prototype: tissue geometry &amp; ids from the Shahan et al. (2022) root eFP SVG template; expression values pulled live from the existing <b>at_root_rs</b> eFP datasource so colouring works before final curation is confirmed by the lab.</li>
+            <li>Single-cell RNA-seq atlas of the <i>Arabidopsis thaliana</i> root, comparing wild-type (Col-0) with the ground-tissue patterning mutants <i>scarecrow-4</i> (scr-4, Landsberg background backcrossed to Col-0 ×5) and <i>shortroot-2</i> (shr-2, Col-0 background).</li>
+            <li>Plants were grown vertically on 1X LS, 1% sucrose plates under 16h light / 8h dark at 22°C; roots were protoplasted and profiled with the 10x Genomics Chromium Single Cell 3’ GEM Kit v3 (Illumina NovaSeq 6000).</li>
+            <li>Raw and processed data deposited as GSE152766 (Shahan, Hsu, Nolan et al. 2022); processed with COPILOT (github.com/Hsu-Che-Wei/COPILOT) and integrated per-genotype as rc.integrated_scr / rc.integrated_shr Seurat objects.</li>
+            <li>Cell types identified: Root cortex, Root endodermis, Pericycle, Phloem, Root procambium, Trichoblast (root-hair cell), Atrichoblast (non-hair cell), Xylem, Collumella root cap, Lateral root cap, Vascular bundle, Xylem pole pericycle, Protoxylem, Phloem pole pericycle, and Metaxylem.</li>
+            <li><b>Sample assignment note for Vincent to verify:</b> GSE152766 contains 2 scr-4 samples (sc_25/GSM4626000, sc_36/GSM4626003) and 2 shr-2 samples (sc_52/GSM4626007, sc_53/GSM4626008), each with its own GEO-annotated batch-matched wild-type controls (sc_20/sc_21 for the scr-4 batch; sc_30/sc_31 for the other scr-4 batch; sc_51 for the shr-2 batch). The Col-0 tissue entries below use the union of these five batch-matched WT samples (GSM4625998, GSM4625999, GSM4626001, GSM4626002, GSM4626006) as the wild-type baseline shown alongside both mutants, rather than the full 15-sample WT pool used to build the main root atlas — please confirm this is the right baseline before this goes live.</li>
+            <li>Results from Shahan, Hsu, Nolan et al. (2022) <i>Developmental Cell</i> 57(4):543-560.e9. DOI: 10.1016/j.devcel.2022.01.008</li>
+        </info>
+
+        <group name="Root cortex">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_cortex" name="Root cortex (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_cortex" name="Root cortex (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_tip_cortex" name="Root cortex (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_cortex" name="Root cortex (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_cortex" name="Root cortex (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_tip_cortex" name="Root cortex (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_cortex" name="Root cortex (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_cortex" name="Root cortex (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_tip_cortex" name="Root cortex (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Root endodermis">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_endodermis" name="Root endodermis (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_endodermis" name="Root endodermis (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_tip_endodermis" name="Root endodermis (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_endodermis" name="Root endodermis (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_endodermis" name="Root endodermis (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_tip_endodermis" name="Root endodermis (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_endodermis" name="Root endodermis (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_endodermis" name="Root endodermis (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_tip_endodermis" name="Root endodermis (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Pericycle">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_pericycle" name="Pericycle (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_pericycle" name="Pericycle (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_tip_pericycle" name="Pericycle (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_pericycle" name="Pericycle (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_pericycle" name="Pericycle (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_tip_pericycle" name="Pericycle (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_pericycle" name="Pericycle (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_pericycle" name="Pericycle (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_tip_pericycle" name="Pericycle (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Phloem">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_phloem" name="Phloem (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_phloem" name="Phloem (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_phloem" name="Phloem (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_phloem" name="Phloem (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_phloem" name="Phloem (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_phloem" name="Phloem (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Root procambium">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_procambium" name="Root procambium (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_procambium" name="Root procambium (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_procambium" name="Root procambium (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_procambium" name="Root procambium (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_procambium" name="Root procambium (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_procambium" name="Root procambium (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Trichoblast (root-hair cell)">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_trichoblast" name="Trichoblast (root-hair cell) (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_trichoblast" name="Trichoblast (root-hair cell) (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_trichoblast" name="Trichoblast (root-hair cell) (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_trichoblast" name="Trichoblast (root-hair cell) (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_trichoblast" name="Trichoblast (root-hair cell) (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_trichoblast" name="Trichoblast (root-hair cell) (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Xylem (combined)">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_xylem" name="Xylem (combined) (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_side_xylem" name="Xylem (combined) (side view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_xylem" name="Xylem (combined) (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_side_xylem" name="Xylem (combined) (side view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_xylem" name="Xylem (combined) (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_side_xylem" name="Xylem (combined) (side view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Atrichoblast (non-hair cell)">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_top_atrichoblast" name="Atrichoblast (non-hair cell) (top view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="col0_tip_atrichoblast" name="Atrichoblast (non-hair cell) (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_top_atrichoblast" name="Atrichoblast (non-hair cell) (top view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="scr4_tip_atrichoblast" name="Atrichoblast (non-hair cell) (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_top_atrichoblast" name="Atrichoblast (non-hair cell) (top view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+            <tissue id="shr2_tip_atrichoblast" name="Atrichoblast (non-hair cell) (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Collumella root cap">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_tip_columella" name="Collumella root cap (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_tip_columella" name="Collumella root cap (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_tip_columella" name="Collumella root cap (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Lateral root cap">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_tip_lateral_root_cap" name="Lateral root cap (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_tip_lateral_root_cap" name="Lateral root cap (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_tip_lateral_root_cap" name="Lateral root cap (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Vascular bundle">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_tip_vascular" name="Vascular bundle (tip view), Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_tip_vascular" name="Vascular bundle (tip view), scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_tip_vascular" name="Vascular bundle (tip view), shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Xylem pole pericycle">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_xpp_circle" name="Xylem pole pericycle, Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_xpp_circle" name="Xylem pole pericycle, scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_xpp_circle" name="Xylem pole pericycle, shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Protoxylem">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_proto_circle" name="Protoxylem, Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_proto_circle" name="Protoxylem, scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_proto_circle" name="Protoxylem, shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Phloem pole pericycle">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_ppp_circle" name="Phloem pole pericycle, Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_ppp_circle" name="Phloem pole pericycle, scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_ppp_circle" name="Phloem pole pericycle, shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+        <group name="Metaxylem">
+            <control sample="GSM4625998"/>
+            <control sample="GSM4625999"/>
+            <control sample="GSM4626001"/>
+            <control sample="GSM4626002"/>
+            <control sample="GSM4626006"/>
+            <tissue id="col0_meta_circle" name="Metaxylem, Col-0 wild type" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4625998"/>
+                <sample name="GSM4625999"/>
+                <sample name="GSM4626001"/>
+                <sample name="GSM4626002"/>
+                <sample name="GSM4626006"/>
+            </tissue>
+            <tissue id="scr4_meta_circle" name="Metaxylem, scarecrow-4 (scr-4)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626000"/>
+                <sample name="GSM4626003"/>
+            </tissue>
+            <tissue id="shr2_meta_circle" name="Metaxylem, shortroot-2 (shr-2)" colorKey="#FFFF00">
+                <link url="https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8"/>
+                <sample name="GSM4626007"/>
+                <sample name="GSM4626008"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

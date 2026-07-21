@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="embryo" class="" db="at_seed_martin" img="at_seed_l3_template_martin.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_seed_martin&amp;</webservice>
+        <info>
+            <li>Single-nucleus RNA-seq (snRNA-seq) embryo subclustering view (Level 3 annotation, <code>level_3_annotation_full_timed</code>) from the same dataset and paper as <code>at_seed_martin.xml</code>: Martin, Cogdill, Pusey &amp; Gehring (2026) <i>Nature Plants</i> 12:1133–1149. DOI: 10.1038/s41477-026-02295-8. GEO accession GSE295007.</li>
+            <li><b>Control:</b> as with the L2 seed view, there is no single biological control sample &#x2014; the relative (log₂ ratio) view is centred on the <i>median</i> of all displayed embryo-subtype pseudobulk means for a given gene, matching this tool's existing <code>expression_to_color_relative(median_ctrl, ...)</code> convention. <code>Med_CTRL</code> is a synthetic placeholder representing that computed median, not a real GSM sample.</li>
+            <li>Tissue ids below are the literal, verbatim <code>id</code> attributes from <code>at_seed_l3_template_martin.svg</code> (including the embedded numbering, DAP prefix, and marker-gene parentheticals, e.g. <code>5DAP 5. EMB vascular primordium and hypophysis (SHR and PIN4)</code>) &#x2014; confirmed against the SVG with no synthetic/compound keys.</li>
+            <li>Cell-type groups harmonize the same embryo subtype across timepoints where the underlying biological structure recurs (e.g. Upper protoderm spans 3/5/7 DAP), per the paper's embryo subclustering analysis (Fig. 1f–i): upper/lower protoderm, suspensor, cortical initials, vascular primordium, ground tissue initials, hypophysis, and inner cotyledon.</li>
+            <li><b>Note:</b> the paper reports 5 subclusters in the 3 DAP embryo and 6 in the 5 DAP embryo, but this SVG only draws 2 of the 3DAP subtypes (upper protoderm, suspensor) and 4 of the 5DAP subtypes (upper protoderm, lower protoderm, cortical initials, the combined vascular-primordium-and-hypophysis cluster) &#x2014; consistent with the same curated-snapshot pattern already flagged for the L2 seed view. The 5DAP vascular primordium and hypophysis are not separately resolved as distinct clusters (drawn as one combined region), unlike at 7DAP where they are split into two ids; both are grouped together here under "Vascular primordium and hypophysis" to avoid listing the same SVG id under two groups.</li>
+            <li>Sample replicate assignment per timepoint, from GSE295007 (identical to the L2 seed view): 3DAP = GSM8939988 (rep1a), GSM8939989 (rep1b), GSM8939990 (rep2); 5DAP = GSM8939991 (rep1), GSM8939992 (rep2); 7DAP = GSM8939993 (rep1), GSM8939994 (rep2).</li>
+        </info>
+
+        <group name="Upper protoderm">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP 1. EMB upper protoderm (PDF1)" name="3DAP 1. EMB upper protoderm (PDF1)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="5DAP 1. EMB upper protoderm I (PDF1 and KRATOS)" name="5DAP 1. EMB upper protoderm I (PDF1 and KRATOS)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="7DAP 1. EMB upper protoderm (PDF1)" name="7DAP 1. EMB upper protoderm (PDF1)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Lower protoderm">
+            <control sample="Med_CTRL"/>
+            <tissue id="5DAP 3. EMB lower protoderm (PDF1 and KAN1)" name="5DAP 3. EMB lower protoderm (PDF1 and KAN1)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="7DAP 2. EMB lower protoderm (PDF1 and KAN1)" name="7DAP 2. EMB lower protoderm (PDF1 and KAN1)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Suspensor">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP 3. EMB suspensor (PIN7)" name="3DAP 3. EMB suspensor (PIN7)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+        </group>
+        <group name="Cortical initials">
+            <control sample="Med_CTRL"/>
+            <tissue id="5DAP 4. EMB cortical initials (XYL4 and JKD)" name="5DAP 4. EMB cortical initials (XYL4 and JKD)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="7DAP 6. EMB cortical initials (JKD)" name="7DAP 6. EMB cortical initials (JKD)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Vascular primordium and hypophysis">
+            <control sample="Med_CTRL"/>
+            <tissue id="5DAP 5. EMB vascular primordium and hypophysis (SHR and PIN4)" name="5DAP 5. EMB vascular primordium and hypophysis (SHR and PIN4)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="7DAP 4. EMB vascular primordium (SHR and JUL1)" name="7DAP 4. EMB vascular primordium (SHR and JUL1)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+            <tissue id="7DAP 7. EMB hypophysis (SMB)" name="7DAP 7. EMB hypophysis (SMB)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Inner cotyledon">
+            <control sample="Med_CTRL"/>
+            <tissue id="7DAP 3. EMB inner cotyledon (XYL4)" name="7DAP 3. EMB inner cotyledon (XYL4)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Ground tissue initials">
+            <control sample="Med_CTRL"/>
+            <tissue id="7DAP 5. EMB ground tissue initials (JKD and SCR)" name="7DAP 5. EMB ground tissue initials (JKD and SCR)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

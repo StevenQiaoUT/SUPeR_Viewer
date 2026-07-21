@@ -1,0 +1,322 @@
+[
+    {
+        "cell_type": "D0_Defense state",
+        "gene": "AT3G05727",
+        "average_expression": -0.03204030054400755
+    },
+    {
+        "cell_type": "D0_Dividing",
+        "gene": "AT3G05727",
+        "average_expression": 0.052080149922135326
+    },
+    {
+        "cell_type": "D0_Epidermal",
+        "gene": "AT3G05727",
+        "average_expression": 0.037784308253005286
+    },
+    {
+        "cell_type": "D0_Guard",
+        "gene": "AT3G05727",
+        "average_expression": -0.028417850922778966
+    },
+    {
+        "cell_type": "D0_Hydathode",
+        "gene": "AT3G05727",
+        "average_expression": -0.008345064264576497
+    },
+    {
+        "cell_type": "D0_Immune active",
+        "gene": "AT3G05727",
+        "average_expression": -0.06085254337056353
+    },
+    {
+        "cell_type": "D0_Mesophyll",
+        "gene": "AT3G05727",
+        "average_expression": -0.003085216688736015
+    },
+    {
+        "cell_type": "D0_Metabolic stress state",
+        "gene": "AT3G05727",
+        "average_expression": -0.1140482692329293
+    },
+    {
+        "cell_type": "D0_Myrosin",
+        "gene": "AT3G05727",
+        "average_expression": 0.22854937838989228
+    },
+    {
+        "cell_type": "D0_Phloem Parenchyma",
+        "gene": "AT3G05727",
+        "average_expression": -0.00029936322460354315
+    },
+    {
+        "cell_type": "D0_Phloem companion",
+        "gene": "AT3G05727",
+        "average_expression": -0.04766616881665651
+    },
+    {
+        "cell_type": "D0_Sieve element_responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.021775572852448553
+    },
+    {
+        "cell_type": "D0_Stress responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.11564335375966851
+    },
+    {
+        "cell_type": "D0_Sugar metabolic state",
+        "gene": "AT3G05727",
+        "average_expression": 6.793230807808833
+    },
+    {
+        "cell_type": "D0_Trichome",
+        "gene": "AT3G05727",
+        "average_expression": 0.1493372638773766
+    },
+    {
+        "cell_type": "D0_Vascular",
+        "gene": "AT3G05727",
+        "average_expression": -0.020088718336298186
+    },
+    {
+        "cell_type": "R15_Defense state",
+        "gene": "AT3G05727",
+        "average_expression": -0.05053147240945626
+    },
+    {
+        "cell_type": "R15_Dividing",
+        "gene": "AT3G05727",
+        "average_expression": 0.06042295701621006
+    },
+    {
+        "cell_type": "R15_Epidermal",
+        "gene": "AT3G05727",
+        "average_expression": -0.016459326800234823
+    },
+    {
+        "cell_type": "R15_Guard",
+        "gene": "AT3G05727",
+        "average_expression": -0.132063925442456
+    },
+    {
+        "cell_type": "R15_Hydathode",
+        "gene": "AT3G05727",
+        "average_expression": -0.1496246963169521
+    },
+    {
+        "cell_type": "R15_Immune active",
+        "gene": "AT3G05727",
+        "average_expression": -0.08885026172371532
+    },
+    {
+        "cell_type": "R15_Mesophyll",
+        "gene": "AT3G05727",
+        "average_expression": -0.0962986151775179
+    },
+    {
+        "cell_type": "R15_Metabolic stress state",
+        "gene": "AT3G05727",
+        "average_expression": -0.048839710669886786
+    },
+    {
+        "cell_type": "R15_Myrosin",
+        "gene": "AT3G05727",
+        "average_expression": 0.028655264504484614
+    },
+    {
+        "cell_type": "R15_Phloem Parenchyma",
+        "gene": "AT3G05727",
+        "average_expression": -0.12823255870094122
+    },
+    {
+        "cell_type": "R15_Phloem companion",
+        "gene": "AT3G05727",
+        "average_expression": -0.006182902782096087
+    },
+    {
+        "cell_type": "R15_Sieve element_responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.05758444347978385
+    },
+    {
+        "cell_type": "R15_Stress responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.05260176713986633
+    },
+    {
+        "cell_type": "R15_Sugar metabolic state",
+        "gene": "AT3G05727",
+        "average_expression": 7.605207524243915
+    },
+    {
+        "cell_type": "R15_Trichome",
+        "gene": "AT3G05727",
+        "average_expression": 0.01082593672173415
+    },
+    {
+        "cell_type": "R15_Vascular",
+        "gene": "AT3G05727",
+        "average_expression": -0.06384191984310714
+    },
+    {
+        "cell_type": "W0_Defense state",
+        "gene": "AT3G05727",
+        "average_expression": -0.07585345631083859
+    },
+    {
+        "cell_type": "W0_Dividing",
+        "gene": "AT3G05727",
+        "average_expression": 0.06974939058677827
+    },
+    {
+        "cell_type": "W0_Epidermal",
+        "gene": "AT3G05727",
+        "average_expression": 0.027055174449260803
+    },
+    {
+        "cell_type": "W0_Guard",
+        "gene": "AT3G05727",
+        "average_expression": -0.050642683244579614
+    },
+    {
+        "cell_type": "W0_Hydathode",
+        "gene": "AT3G05727",
+        "average_expression": 0.3485295562049198
+    },
+    {
+        "cell_type": "W0_Immune active",
+        "gene": "AT3G05727",
+        "average_expression": -0.07473368920782025
+    },
+    {
+        "cell_type": "W0_Mesophyll",
+        "gene": "AT3G05727",
+        "average_expression": -0.03847958226656678
+    },
+    {
+        "cell_type": "W0_Metabolic stress state",
+        "gene": "AT3G05727",
+        "average_expression": 0.13196729424186732
+    },
+    {
+        "cell_type": "W0_Myrosin",
+        "gene": "AT3G05727",
+        "average_expression": 0.26000281574694895
+    },
+    {
+        "cell_type": "W0_Phloem Parenchyma",
+        "gene": "AT3G05727",
+        "average_expression": 0.12168733689184434
+    },
+    {
+        "cell_type": "W0_Phloem companion",
+        "gene": "AT3G05727",
+        "average_expression": -0.0869975293572199
+    },
+    {
+        "cell_type": "W0_Sieve element_responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.029821358405892423
+    },
+    {
+        "cell_type": "W0_Stress responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.1667441965770915
+    },
+    {
+        "cell_type": "W0_Sugar metabolic state",
+        "gene": "AT3G05727",
+        "average_expression": 7.204138697213906
+    },
+    {
+        "cell_type": "W0_Trichome",
+        "gene": "AT3G05727",
+        "average_expression": 0.023422703297597772
+    },
+    {
+        "cell_type": "W0_Vascular",
+        "gene": "AT3G05727",
+        "average_expression": -0.03665198708257613
+    },
+    {
+        "cell_type": "W15_Defense state",
+        "gene": "AT3G05727",
+        "average_expression": -0.039811171606896525
+    },
+    {
+        "cell_type": "W15_Dividing",
+        "gene": "AT3G05727",
+        "average_expression": -0.012284662783689821
+    },
+    {
+        "cell_type": "W15_Epidermal",
+        "gene": "AT3G05727",
+        "average_expression": -0.006243618472683713
+    },
+    {
+        "cell_type": "W15_Guard",
+        "gene": "AT3G05727",
+        "average_expression": -0.07457642276582993
+    },
+    {
+        "cell_type": "W15_Hydathode",
+        "gene": "AT3G05727",
+        "average_expression": -0.02180074612812286
+    },
+    {
+        "cell_type": "W15_Immune active",
+        "gene": "AT3G05727",
+        "average_expression": -0.07933149406878245
+    },
+    {
+        "cell_type": "W15_Mesophyll",
+        "gene": "AT3G05727",
+        "average_expression": 0.007268408894908992
+    },
+    {
+        "cell_type": "W15_Metabolic stress state",
+        "gene": "AT3G05727",
+        "average_expression": -0.010161752053073198
+    },
+    {
+        "cell_type": "W15_Myrosin",
+        "gene": "AT3G05727",
+        "average_expression": 0.15876186548667712
+    },
+    {
+        "cell_type": "W15_Phloem Parenchyma",
+        "gene": "AT3G05727",
+        "average_expression": 0.012757366066436062
+    },
+    {
+        "cell_type": "W15_Phloem companion",
+        "gene": "AT3G05727",
+        "average_expression": -0.0654170440374996
+    },
+    {
+        "cell_type": "W15_Sieve element_responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.04777680336834659
+    },
+    {
+        "cell_type": "W15_Stress responsive",
+        "gene": "AT3G05727",
+        "average_expression": -0.09459204803604142
+    },
+    {
+        "cell_type": "W15_Sugar metabolic state",
+        "gene": "AT3G05727",
+        "average_expression": 6.1164580174531435
+    },
+    {
+        "cell_type": "W15_Trichome",
+        "gene": "AT3G05727",
+        "average_expression": 0.056783732631663156
+    },
+    {
+        "cell_type": "W15_Vascular",
+        "gene": "AT3G05727",
+        "average_expression": -0.013398327492887998
+    }
+]

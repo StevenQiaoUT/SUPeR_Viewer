@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="all" class="" db="at_silique_lee" img="at_silique_template_lee.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_silique_lee&amp;</webservice>
+        <info>
+            <li>Single-nucleus RNA-seq (snRNA-seq) data from the Arabidopsis seed-to-seed developmental atlas: Lee, Nobori, Illouz-Eliaz, Jow, Nery &amp; Ecker. <i>A Single-Nucleus Atlas of Seed-to-Seed Development in Arabidopsis</i>. <i>Nature Plants</i> (2025/2026). DOI: 10.1038/s41477-025-02072-z (preprint: bioRxiv 10.1101/2023.03.23.533992). GEO accession GSE226097.</li>
+            <li><b>No experimental condition/treatment axis applies to this organ view</b> &#x2014; nuclei were collected from a single developmental snapshot, so there is no control-vs-treatment comparison. As requested, the relative (log₂ ratio) view is instead centred on the <i>median</i> of all displayed cell-type pseudobulk means for a given gene, matching this tool's existing <code>expression_to_color_relative(median_ctrl, ...)</code> convention already used for the other Lee/Martin datasets. <code>Med_CTRL</code> is a synthetic placeholder representing that computed median, not a real GSM sample.</li>
+            <li>Tissue ids below are the literal, verbatim <code>id</code> attributes from the corresponding SVG template, confirmed with no synthetic/compound keys.</li>
+            <li>Samples used: 44-day-old siliques (8 snRNA-seq runs: GSM7063688–GSM7063695). All cell types within this organ share the same set of libraries, since cell type is a post-hoc clustering annotation rather than a separate sequencing run.</li>
+        </info>
+
+        <group name="Young_silique">
+            <control sample="Med_CTRL"/>
+            <tissue id="Young_silique" name="Young_silique" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063688"/>
+                <sample name="GSM7063689"/>
+                <sample name="GSM7063690"/>
+                <sample name="GSM7063691"/>
+                <sample name="GSM7063692"/>
+                <sample name="GSM7063693"/>
+                <sample name="GSM7063694"/>
+                <sample name="GSM7063695"/>
+            </tissue>
+        </group>
+        <group name="Mature_silique">
+            <control sample="Med_CTRL"/>
+            <tissue id="Mature_silique" name="Mature_silique" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063688"/>
+                <sample name="GSM7063689"/>
+                <sample name="GSM7063690"/>
+                <sample name="GSM7063691"/>
+                <sample name="GSM7063692"/>
+                <sample name="GSM7063693"/>
+                <sample name="GSM7063694"/>
+                <sample name="GSM7063695"/>
+            </tissue>
+        </group>
+        <group name="Seed_(silique)">
+            <control sample="Med_CTRL"/>
+            <tissue id="Seed_(silique)" name="Seed_(silique)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063688"/>
+                <sample name="GSM7063689"/>
+                <sample name="GSM7063690"/>
+                <sample name="GSM7063691"/>
+                <sample name="GSM7063692"/>
+                <sample name="GSM7063693"/>
+                <sample name="GSM7063694"/>
+                <sample name="GSM7063695"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

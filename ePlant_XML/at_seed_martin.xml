@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="all" class="" db="at_seed_martin" img="at_seed_template_martin.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_seed_martin&amp;</webservice>
+        <info>
+            <li>Single-nucleus RNA-seq (snRNA-seq) atlas of early <i>Arabidopsis thaliana</i> (Col-0) seed development at 3, 5, and 7 days after pollination (DAP), profiling embryo, endosperm, seed coat, and unfertilized ovule/funiculus nuclei (10x Genomics, two biological replicates per timepoint, 7 libraries total; one 3DAP replicate was split across two reactions, giving rep1a/rep1b).</li>
+            <li>Results from Martin, Cogdill, Pusey &amp; Gehring (2026) <i>Nature Plants</i> 12:1133–1149. DOI: 10.1038/s41477-026-02295-8. Raw data and processed count matrices: GEO accession GSE295007.</li>
+            <li><b>Control:</b> as with the other Lee/Martin-style relative views in this tool, there is no single biological control sample &#x2014; the relative (log₂ ratio) view is centred on the <i>median</i> of all displayed cell-type pseudobulk means for a given gene, matching the existing <code>expression_to_color_relative(median_ctrl, ...)</code> convention already used for this dataset. <code>Med_CTRL</code> is therefore a synthetic placeholder representing that computed median, not a real GSM sample, following the same convention as the supplied sugarcane example file.</li>
+            <li>Tissue ids below are the literal, verbatim <code>id</code> attributes from <code>at_seed_template_martin.svg</code> (e.g. <code>5DAP ii1'</code>, including the embedded DAP prefix and the apostrophe in ii1′) &#x2014; confirmed against the SVG with no synthetic/compound keys.</li>
+            <li>Cell-type groups are organized by the paper's own L1 tissue-system hierarchy (Fig. 1b,e): Embryo, Endosperm, Seed coat, and Unfertilized ovule and funiculus. Within each L1 group, individual tissue entries are the dataset's L2 annotations (e.g. CZE, MCE, PEN within Endosperm; ii1/ii1′/ii2/oi1/oi2/CPT/CZSC within Seed coat), harmonized across DAP timepoints per the paper's methods.</li>
+            <li><b>Note:</b> this SVG template only draws 17 of the L2 annotations described in the paper (not the full per-timepoint L2/L3 catalog) &#x2014; for example, there is no 7DAP embryo or 7DAP seed coat subtype group, and 5DAP does not separately resolve CZE/MCE/PEN even though the paper text discusses "5 DAP MCE" extensively (Fig. 3e). This view appears to be a curated representative snapshot per timepoint rather than an exhaustive cluster catalog; please confirm with Nicholas/the BAR team whether additional SVG regions should be added for completeness.</li>
+            <li>Sample replicate assignment per timepoint, from GSE295007: 3DAP = GSM8939988 (rep1a), GSM8939989 (rep1b), GSM8939990 (rep2); 5DAP = GSM8939991 (rep1), GSM8939992 (rep2); 7DAP = GSM8939993 (rep1), GSM8939994 (rep2). All cell types within a timepoint share the same set of libraries since cell type is a post-hoc clustering annotation, not a separate sequencing run.</li>
+        </info>
+
+        <group name="Embryo">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP Embryo" name="Embryo, 3 days after pollination (3DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="5DAP EMB" name="Embryo, 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+        </group>
+        <group name="Endosperm">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP Endosperm" name="Endosperm, 3 days after pollination (3DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="7DAP CZE" name="Chalazal endosperm (CZE), 7 days after pollination (7DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+            <tissue id="7DAP MCE" name="Micropylar endosperm (MCE), 7 days after pollination (7DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+            <tissue id="7DAP PEN" name="Peripheral endosperm (PEN), 7 days after pollination (7DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939993"/>
+                <sample name="GSM8939994"/>
+            </tissue>
+        </group>
+        <group name="Seed coat">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP Seed coat" name="Seed coat, 3 days after pollination (3DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="5DAP CPT" name="Chalazal proliferating tissue (CPT), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP CZSC" name="Chalazal seed coat (CZSC), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP ii1" name="Inner integument 1 (ii1), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP ii1'" name="Inner integument 1′ (ii1′), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP ii2" name="Inner integument 2 (ii2), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP oi1" name="Outer integument 1 (oi1), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+            <tissue id="5DAP oi2" name="Outer integument 2 (oi2), 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+        </group>
+        <group name="Unfertilized ovule and funiculus">
+            <control sample="Med_CTRL"/>
+            <tissue id="3DAP Funiculus" name="Funiculus, 3 days after pollination (3DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="3DAP Ovule" name="Unfertilized ovule, 3 days after pollination (3DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939988"/>
+                <sample name="GSM8939989"/>
+                <sample name="GSM8939990"/>
+            </tissue>
+            <tissue id="5DAP FUN" name="Funiculus, 5 days after pollination (5DAP)" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-026-02295-8"/>
+                <sample name="GSM8939991"/>
+                <sample name="GSM8939992"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

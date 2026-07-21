@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<specimen name="Arabidopsis">
+    <view name="all" class="" db="at_stem_lee" img="at_stem_template_lee.svg">
+        <webservice>//bar.utoronto.ca/eplant/cgi-bin/plantefp.cgi?datasource=at_stem_lee&amp;</webservice>
+        <info>
+            <li>Single-nucleus RNA-seq (snRNA-seq) data from the Arabidopsis seed-to-seed developmental atlas: Lee, Nobori, Illouz-Eliaz, Jow, Nery &amp; Ecker. <i>A Single-Nucleus Atlas of Seed-to-Seed Development in Arabidopsis</i>. <i>Nature Plants</i> (2025/2026). DOI: 10.1038/s41477-025-02072-z (preprint: bioRxiv 10.1101/2023.03.23.533992). GEO accession GSE226097.</li>
+            <li><b>No experimental condition/treatment axis applies to this organ view</b> &#x2014; nuclei were collected from a single developmental snapshot, so there is no control-vs-treatment comparison. As requested, the relative (log₂ ratio) view is instead centred on the <i>median</i> of all displayed cell-type pseudobulk means for a given gene, matching this tool's existing <code>expression_to_color_relative(median_ctrl, ...)</code> convention already used for the other Lee/Martin datasets. <code>Med_CTRL</code> is a synthetic placeholder representing that computed median, not a real GSM sample.</li>
+            <li>Tissue ids below are the literal, verbatim <code>id</code> attributes from the corresponding SVG template, confirmed with no synthetic/compound keys.</li>
+            <li>Samples used: 40-day-old stem (branched stem runs 1–3: GSM7063702–704; basal+branched CellPlex runs 1–2: GSM7063705–706; basal stem runs 1–2: GSM7063707–708; apical stem runs 1–3: GSM7063709–711; apical stem CellPlex runs 1–3: GSM7063712–714). All cell types within this organ share the same set of libraries, since cell type is a post-hoc clustering annotation rather than a separate sequencing run.</li>
+        </info>
+
+        <group name="Cambium">
+            <control sample="Med_CTRL"/>
+            <tissue id="Cambium" name="Cambium" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Cortex">
+            <control sample="Med_CTRL"/>
+            <tissue id="Cortex" name="Cortex" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Epidermal">
+            <control sample="Med_CTRL"/>
+            <tissue id="Epidermal" name="Epidermal" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Guard">
+            <control sample="Med_CTRL"/>
+            <tissue id="Guard" name="Guard" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Phloem">
+            <control sample="Med_CTRL"/>
+            <tissue id="Phloem" name="Phloem" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Phloem cap">
+            <control sample="Med_CTRL"/>
+            <tissue id="Phloem cap" name="Phloem cap" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Pith">
+            <control sample="Med_CTRL"/>
+            <tissue id="Pith" name="Pith" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Starch sheath">
+            <control sample="Med_CTRL"/>
+            <tissue id="Starch sheath" name="Starch sheath" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Trichome">
+            <control sample="Med_CTRL"/>
+            <tissue id="Trichome" name="Trichome" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+        <group name="Xylem">
+            <control sample="Med_CTRL"/>
+            <tissue id="Xylem" name="Xylem" colorKey="#ffffff">
+                <link url="https://doi.org/10.1038/s41477-025-02072-z"/>
+                <sample name="GSM7063702"/>
+                <sample name="GSM7063703"/>
+                <sample name="GSM7063704"/>
+                <sample name="GSM7063705"/>
+                <sample name="GSM7063706"/>
+                <sample name="GSM7063707"/>
+                <sample name="GSM7063708"/>
+                <sample name="GSM7063709"/>
+                <sample name="GSM7063710"/>
+                <sample name="GSM7063711"/>
+                <sample name="GSM7063712"/>
+                <sample name="GSM7063713"/>
+                <sample name="GSM7063714"/>
+            </tissue>
+        </group>
+
+    </view>
+</specimen>

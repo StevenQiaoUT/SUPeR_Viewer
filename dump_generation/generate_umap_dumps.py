@@ -21,6 +21,30 @@ Key design decisions:
     - Expression JSON is built in-memory per gene and flushed immediately
     - Inner loop vectorized with numpy fancy indexing (no Python for loops)
 
+Cell-type label convention
+---------------------------
+For datasets where the pseudobulk SVG viewer keys expression on a
+condition/genotype PLUS a cell type (rather than cell type alone), the
+`cell_type` column written here is the same combined key, so a hover on
+the SVG can find matching points in the UMAP via a plain string match.
+
+    rice ("CellAnnotation" + "Condition"):
+        combined as "{Condition}_{CellAnnotation}", using the raw obs
+        values directly — these already match generate_pseudobulk_dumps.py's
+        data_bot_id cell-type portion (both scripts read the same obs
+        columns with no relabeling), including the '.'-separated spelling
+        already present in the source h5ad (e.g. "Mild.Drought", "Phloem.SE").
+
+    at_root_rs ("Celltype" + "Genotype"):
+        combined as "{genotype_code}_{Celltype}", where genotype_code is
+        the SHORT SVG-style code (shr2 / scr4 / col0) — NOT the raw
+        Genotype obs value ("Col-0 (shr2)", "Ler (scr4)", "Col-0"). The
+        SVG element ids and generate_pseudobulk_dumps.py's post-processed
+        data_bot_id values (e.g. "shr2_top_endodermis") use these short
+        codes, so raw-value concatenation would silently never match
+        anything. _ROOT_GENO_PREFIX below mirrors the identical table in
+        generate_pseudobulk_dumps.py.
+
 Usage:
     python3 generate_umap_dumps.py
     python3 generate_umap_dumps.py --datasets rice arabidopsis_nat
@@ -52,18 +76,20 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 DATASETS = {
     "arabidopsis_nat": {
         "h5ad": "/mnt/home/sqiao/h5ad_files/arabidopsis_nat.h5ad",
-        "umap_col": "label_major",
+        "umap_col": "label_majorXcondition",
         "db_name": "arabidopsis_NIE_umap",
         "gene_id_col": "TAIR_ID",
     },
     "rice": {
         "h5ad": "/mnt/home/sqiao/h5ad_files/RiceOW.h5ad",
         "umap_col": "CellAnnotation",
+        "umap_col2": "Condition",   # combined as "{Condition}_{CellAnnotation}" — matches pseudobulk data_bot_id
         "db_name": "rice_OW_umap",
     },
     "at_root_rs": {
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_root_shahan.h5ad",
         "umap_col": "Celltype",
+        "umap_col2": "Genotype",    # combined as "{genotype_code}_{Celltype}" via _ROOT_GENO_PREFIX
         "db_name": "arabidopsis_root_shahan_umap",
     },
     "at_seed_martin": {
@@ -86,6 +112,15 @@ DATASETS = {
         "umap_col": "CellType",
         "db_name": "arabidopsis_stem_lee_umap",
     },
+}
+
+# Genotype prefix in SVG element ids for each raw obs Genotype value.
+# Mirrors _ROOT_GENO_PREFIX in generate_pseudobulk_dumps.py exactly — keep
+# these two tables in sync if the root dataset's genotype labels ever change.
+_ROOT_GENO_PREFIX = {
+    'Col-0 (shr2)': 'shr2',
+    'Ler (scr4)':   'scr4',
+    'Col-0':        'col0',
 }
 
 # ---------------------------------------------------------------------------
@@ -306,13 +341,49 @@ def write_dump(
 
     umap = np.asarray(adata.obsm["X_umap"])[:, :2].astype(float)
 
+    # ── Cell-type label(s) ────────────────────────────────────────────────
     umap_col = cfg["umap_col"]
-    if umap_col in adata.obs.columns:
-        labels = adata.obs[umap_col].astype(str).to_numpy()
-    else:
+    umap_col2 = cfg.get("umap_col2")
+
+    if umap_col not in adata.obs.columns:
         fallback = adata.obs.columns[0]
         print(f"  [warn] umap_col '{umap_col}' not found, using '{fallback}'", file=sys.stderr)
-        labels = adata.obs[fallback].astype(str).to_numpy()
+        umap_col = fallback
+
+    col1 = adata.obs[umap_col].astype(str).str.strip().to_numpy()
+
+    if umap_col2 and umap_col2 in adata.obs.columns:
+        col2_raw = adata.obs[umap_col2].astype(str).str.strip().to_numpy()
+
+        if ds_key == "at_root_rs":
+            # Map the raw Genotype obs value to its short SVG-style code
+            # (shr2 / scr4 / col0) before combining — the SVG element ids
+            # and the pseudobulk data_bot_id values use these short codes,
+            # not the raw obs text. Unrecognized genotype values fall back
+            # to the raw text so nothing silently disappears; a warning is
+            # printed so the mapping can be extended if new genotypes show up.
+            unmapped = sorted(set(col2_raw) - set(_ROOT_GENO_PREFIX))
+            if unmapped:
+                print(
+                    f"  [warn] Genotype value(s) not in _ROOT_GENO_PREFIX, "
+                    f"using raw text: {unmapped}",
+                    file=sys.stderr,
+                )
+            col2 = np.array([_ROOT_GENO_PREFIX.get(g, g) for g in col2_raw])
+        else:
+            col2 = col2_raw
+
+        # "{col2}_{col1}" ordering — mirrors generate_pseudobulk_dumps.py's
+        # combined data_bot_id key exactly (condition/genotype-code first,
+        # then cell type), so this UMAP dump's `cell_type` column agrees
+        # with the pseudobulk viewer's cell-type keys.
+        labels = np.array([f"{c}_{t}" for c, t in zip(col2, col1)])
+        print(f"  Combined cell-type key: '{umap_col2}' + '{umap_col}'", file=sys.stderr)
+    elif umap_col2:
+        print(f"  [warn] umap_col2 '{umap_col2}' not found — using '{umap_col}' alone", file=sys.stderr)
+        labels = col1
+    else:
+        labels = col1
 
     # Sample cell indices ONCE for the whole dataset
     rng = np.random.default_rng(seed)

@@ -35,7 +35,7 @@ DATASETS = {
         "label": "Arabidopsis Drought (Illouz-Eliaz et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/arabidopsis_nat.h5ad",
         "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_natanella.svg",
-        "umap_col": "label_major",
+        "umap_col": "label_majorXcondition",
         "opacity": 1.0,
     },
     "rice": {
@@ -81,11 +81,53 @@ DATASETS = {
         "umap_col": "CellType",
         "opacity": 1.0,
     },
+    "at_seed_0d_lee": {
+        "label": "Arabidopsis Seed — 0 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_0d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seed_0d_lee.svg",
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
+    "at_rosette_21d_lee": {
+        "label": "Arabidopsis Rosette — 21 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_rosette_21d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_rosette_21d_lee.svg",
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
     "at_shoot_zhang": {
         "label": "Arabidopsis Shoot (Zhang et al., 2021)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_shoot_zhang.h5ad",
         "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_shoot_zhang.svg",
         "umap_col": "celltype_after",
+        "opacity": 1.0,
+    },
+    "at_rosette_30d_lee": {
+        "label": "Arabidopsis Rosette — 30 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_rosette_30d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_rosette_30d_lee.svg",
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
+    "at_seedling_3d_lee": {
+        "label": "Arabidopsis Seedling — 3 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_3d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_3d_lee.svg",
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
+    "at_seedling_6d_lee": {
+        "label": "Arabidopsis Seedling — 6 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_6d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_6d_lee.svg",
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
+    "at_seedling_12d_lee": {
+        "label": "Arabidopsis Seedling — 12 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_12d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_12d_lee.svg",
+        "umap_col": "CellType",
         "opacity": 1.0,
     },
 }
@@ -96,8 +138,6 @@ DATASET_COLUMNS = {
         "label_majorXcondition": "label_majorXcondition",
     },
     "rice": {
-        "CellAnnotation": "CellAnnotation",
-        "Condition": "Condition",
         "CAxCondition": "CAxCondition",
     },
     "at_root_rs": {
@@ -116,8 +156,26 @@ DATASET_COLUMNS = {
     "at_stem_lee": {
         "CellType": "cell type",
     },
+    "at_seed_0d_lee": {
+        "CellType": "cell type",
+    },
+    "at_rosette_21d_lee": {
+        "CellType": "cell type",
+    },
     "at_shoot_zhang": {
         "celltype_after": "cell type",
+    },
+    "at_rosette_30d_lee": {
+        "CellType": "cell type",
+    },
+    "at_seedling_3d_lee": {
+        "CellType": "cell type",
+    },
+    "at_seedling_6d_lee": {
+        "CellType": "cell type",
+    },
+    "at_seedling_12d_lee": {
+        "CellType": "cell type",
     },
 }
 
@@ -133,7 +191,13 @@ DATASET_DEFAULT_GENES = {
     "at_flower_lee": "AT3G15510",  # Lee — flower
     "at_silique_lee": "AT3G24140",  # Lee — silique
     "at_stem_lee": "AT5G26000",  # Lee — stem
+    "at_seed_0d_lee": "AT1G01010",  # Lee — seed 0 DAP — TODO: replace with a real marker gene
+    "at_rosette_21d_lee": "AT1G01010",  # Lee — rosette 21 DAP — TODO: replace with a real marker gene
     "at_shoot_zhang": "AT1G65480",  # Zhang — shoot
+    "at_rosette_30d_lee": "AT1G01010",  # Lee — rosette 30 DAP — TODO: replace with a real marker gene
+    "at_seedling_3d_lee": "AT1G01010",  # Lee — seedling 3 DAP — TODO: replace with a real marker gene
+    "at_seedling_6d_lee": "AT1G01010",  # Lee — seedling 6 DAP — TODO: replace with a real marker gene
+    "at_seedling_12d_lee": "AT1G01010",  # Lee — seedling 12 DAP — TODO: replace with a real marker gene
 }
 
 # Curated marker genes per dataset — shown as autocomplete suggestions
@@ -182,12 +246,41 @@ DATASET_MARKER_GENES = {
         {"gene": "AT2G37260", "label": "AT2G37260 — guard"},
         {"gene": "AT1G07640", "label": "AT1G07640 — trichome"},
     ],
+    "at_seed_0d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Epidermal, Guard, Meristematic, Seed_coat, Stele)
+    ],
+    "at_rosette_21d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Epidermal, Guard, Stele are drawn in the SVG; Meristematic and
+        # Unannotated exist in obs but have no corresponding SVG shape)
+    ],
     "at_shoot_zhang": [
         {"gene": "AT1G11840", "label": "AT1G11840 — shoot apical meristem"},
         {"gene": "AT1G01090", "label": "AT1G01090 — mesophyll"},
         {"gene": "AT5G53210", "label": "AT5G53210 — meristemoid and pavement"},
         {"gene": "AT2G25810", "label": "AT2G25810 — guard cells"},
         {"gene": "AT1G12880", "label": "AT1G12880 — companion cells"},
+    ],
+    "at_rosette_30d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Epidermal, Guard, Meristematic, Mesophyll, Stele; Unannotated
+        # exists in obs but has no corresponding SVG shape)
+    ],
+    "at_seedling_3d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Vascular, Mesophyll, Epidermis, Phloem, Dividing, Trichoblast,
+        # Phloem parenchyma; Unknown exists in obs but has no corresponding
+        # SVG shape)
+    ],
+    "at_seedling_6d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Epidermal, Stele, Mesophyll, Meristematic, Guard all drawn in the SVG)
+    ],
+    "at_seedling_12d_lee": [
+        # TODO: replace with real marker genes for this dataset's cell types
+        # (Epidermal, Mesophyll, Stele, Guard drawn in the SVG; Unannotated
+        # exists in obs but has no corresponding SVG shape)
     ],
 }
 
@@ -340,7 +433,7 @@ def expression_to_color_relative(value, control_val, log2_max):
         # Gene expressed in control but absent in sample → maximum downregulation
         return expression_to_color(1.0, 1.0, scheme='yellow_to_blue', ratio=1.0)
     try:
-        log2_ratio = math.log2(value / control_val)
+        log2_ratio = value - control_val   # already log-normalized: difference = fold change
     except (ValueError, ZeroDivisionError):
         return "#ffffff"
 
@@ -854,15 +947,19 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                and el.tag == f'{{{SVG_NS}}}g'
         }
         vis_vals = [expression_dict[k] for k in svg_group_ids if k in expression_dict]
-    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_shoot_zhang'):
+    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_shoot_zhang', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
         # Build vis_vals using exactly the same element-matching logic as the
         # Lee coloring loop: only elements whose id is in expression_dict,
-        # restricted to shape tags (<path/circle/rect/ellipse>) or <g> groups.
-        # This prevents structural SVG IDs (layer groups, defs, etc.) from
-        # accidentally matching expression_dict keys and skewing the median.
+        # restricted to shape tags (<path/circle/rect/ellipse/polygon>) or
+        # <g> groups. This prevents structural SVG IDs (layer groups, defs,
+        # etc.) from accidentally matching expression_dict keys and skewing
+        # the median. (at_rosette_21d_lee draws its cell-type shapes as
+        # <polygon>, unlike the path-based templates used by the other Lee
+        # datasets, hence 'polygon' being included here.)
         _lee_shape_tags = {
             f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
-            f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse', f'{{{SVG_NS}}}g',
+            f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
+            f'{{{SVG_NS}}}polygon', f'{{{SVG_NS}}}g',
         }
         _lee_vis_keys = {
             el.get('id') for el in root.iter()
@@ -892,16 +989,14 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
     log2_max = 1.0  # fallback
 
     def _compute_log2_max(pairs):
-        """pairs: list of (sample_val, control_val). Returns max abs log2 ratio."""
-        ratios = []
+        """pairs: list of (sample_val, control_val). Returns max abs fold-change.
+        Data is already log-normalized, so fold-change = difference, not log2(ratio)."""
+        diffs = []
         for v, ctrl in pairs:
-            if v is None or ctrl is None or ctrl == 0 or v == 0:
+            if v is None or ctrl is None:
                 continue
-            try:
-                ratios.append(abs(math.log2(v / ctrl)))
-            except (ValueError, ZeroDivisionError):
-                pass
-        return max(ratios) if ratios else 1.0
+            diffs.append(abs(v - ctrl))
+        return max(diffs) if diffs else 1.0
 
     if control == "WW" and ds_key == "rice":
         # expression_dict keys are "{cond}_{ct}" built from obs columns.
@@ -1009,12 +1104,36 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
             elem.set('fill', color)
         elem.set('fill-opacity', str(opacity_val))
 
-    def color_paths_in_element(el, color, tip, ct_label=None):
-        """Color all <path> children of el."""
-        for p in el.iter(f'{{{SVG_NS}}}path'):
-            set_fill(p, color, opacity)
-            add_tooltip(p, tip)
-            tag_celltype(p, ct_label)
+    _NAT_SHAPE_TAGS = (
+        f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
+        f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
+    )
+
+    def color_paths_in_element(el, color, tip, ct_label=None, umap_ct_label=None):
+        """Color all drawable shape children of el (path/circle/rect/ellipse).
+
+        Natanella's SVG renders several cell types (Vascular, Phloem
+        Parenchyma, Phloem companion — and the guard/mesophyll/epidermal/
+        trichome cells too) as literal <circle> elements rather than <path>
+        groups. Only matching <path> here meant those circles never got
+        set_fill/add_tooltip/tag_celltype applied, so they had no fill,
+        no data-tooltip, and no data-celltype — i.e. no hover behavior at
+        all, even though the color-selection logic upstream matched fine.
+
+        umap_ct_label carries the *condition-qualified* label (e.g.
+        "D0_Mesophyll") used by natanella's UMAP (umap_col =
+        label_majorXcondition combines condition + cell type). It's kept
+        separate from data-celltype/ct_label — which stays condition-agnostic
+        ("Mesophyll") so the existing SVG-side Highlight dropdown still
+        highlights that cell type across all four condition panels at once.
+        """
+        for tag in _NAT_SHAPE_TAGS:
+            for p in el.iter(tag):
+                set_fill(p, color, opacity)
+                add_tooltip(p, tip)
+                tag_celltype(p, ct_label)
+                if umap_ct_label:
+                    p.set('data-umap-celltype', umap_ct_label)
 
     if ds_key == 'rice':
         # ── Runtime-derived SVG ID → expression_dict key matching ────────────
@@ -1119,11 +1238,11 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 color = expression_to_color_relative(v, ctrl_val, log2_max)
                 if ctrl_val is not None:
                     try:
-                        log2_r = math.log2(v / ctrl_val) if (ctrl_val and v > 0) else float('-inf')
+                        log2_r = v - ctrl_val
                         tip = (
                             f"{key}\nAvg expression: {v:.4f}\n"
                             f"WW expression: {ctrl_val:.4f}\n"
-                            f"Log\u2082 ratio: {log2_r:.4f}"
+                            f"Log fold-change: {log2_r:.4f}"
                         )
                     except (ValueError, ZeroDivisionError):
                         tip = f"{key}\nAvg expression: {v:.4f}"
@@ -1309,8 +1428,8 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 if control == "W0":
                     color = expression_to_color_relative(v, w0_val, log2_max)
                     try:
-                        log2_r = math.log2(v / w0_val) if (w0_val and v > 0) else float('-inf')
-                        tip = f"{key}\nAvg expression: {v:.4f}\nW0 expression: {w0_val:.4f}\nLog\u2082 ratio: {log2_r:.4f}"
+                        log2_r = v - w0_val
+                        tip = f"{key}\nAvg expression: {v:.4f}\nW0 expression: {w0_val:.4f}\nLog fold-change: {log2_r:.4f}"
                     except (ValueError, ZeroDivisionError):
                         tip = f"{key}\nAvg expression: {v:.4f}"
                 else:
@@ -1321,7 +1440,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                     continue
                 el = id_to_el.get(svg_id_fn(c))
                 if el is not None:
-                    color_paths_in_element(el, color, tip, ct)
+                    color_paths_in_element(el, color, tip, ct, umap_ct_label=key)
 
         # Phloem (averaged)
         cell_types_seen.add("Phloem (avg)")
@@ -1341,13 +1460,13 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                     ctrl_avg = (w0_pp + w0_pc) / 2
                     color = expression_to_color_relative(avg_raw, ctrl_avg, log2_max)
                     try:
-                        log2_r = math.log2(avg_raw / ctrl_avg) if (ctrl_avg and avg_raw > 0) else float('-inf')
+                        log2_r = avg_raw - ctrl_avg
                         tip = (
                             f"{c}_Phloem (averaged)\n"
                             f"Phloem Parenchyma: {pp_raw:.4f}\n"
                             f"Phloem Companion: {pc_raw:.4f}\n"
                             f"Avg expression: {avg_raw:.4f}\n"
-                            f"Log\u2082 ratio: {log2_r:.4f}"
+                            f"Log fold-change: {log2_r:.4f}"
                         )
                     except (ValueError, ZeroDivisionError):
                         tip = f"{c}_Phloem (averaged)\nAvg expression: {avg_raw:.4f}"
@@ -1389,8 +1508,8 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 color = expression_to_color_relative(v, ctrl_val, log2_max)
                 if ctrl_val is not None:
                     try:
-                        log2_r = math.log2(v / ctrl_val) if (ctrl_val and v > 0) else float('-inf')
-                        tip = f"{el_id}\nAvg expression: {v:.4f}\ncol0 expression: {ctrl_val:.4f}\nLog\u2082 ratio: {log2_r:.4f}"
+                        log2_r = v - ctrl_val
+                        tip = f"{el_id}\nAvg expression: {v:.4f}\ncol0 expression: {ctrl_val:.4f}\nLog fold-change: {log2_r:.4f}"
                     except (ValueError, ZeroDivisionError):
                         tip = f"{el_id}\nAvg expression: {v:.4f}"
                 else:
@@ -1434,23 +1553,10 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
             v = expression_dict[el_id]
             if control == 'median' and median_ctrl is not None:
                 color = expression_to_color_relative(v, median_ctrl, log2_max)
-                if median_ctrl and median_ctrl > 0 and v > 0:
-                    try:
-                        log2_r = math.log2(v / median_ctrl)
-                        tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                               f"Median control: {median_ctrl:.4f}\n"
-                               f"Log\u2082 ratio: {log2_r:.4f}")
-                    except (ValueError, ZeroDivisionError):
-                        tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                               f"Median control: {median_ctrl:.4f}")
-                elif v == 0:
-                    tip = (f"{el_id}\nAvg expression: 0.0000\n"
-                           f"Median control: {median_ctrl:.4f}\n"
-                           f"Log\u2082 ratio: -\u221e (not expressed)")
-                else:
-                    tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                           f"Median control: {median_ctrl:.4f}\n"
-                           f"Log\u2082 ratio: +\u221e (control = 0)")
+                log2_r = v - median_ctrl
+                tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
+                       f"Median control: {median_ctrl:.4f}\n"
+                       f"Log fold-change: {log2_r:.4f}")
             else:
                 color = get_color(el_id)
                 tip = f"{el_id}\nAvg expression: {raw_val(el_id)}"
@@ -1467,7 +1573,10 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                     add_tooltip(child, tip)
                     tag_celltype(child, ct_label)
 
-    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_shoot_zhang'):
+    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_shoot_zhang', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
+        _lee_paint_tags = (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
+                           f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
+                           f'{{{SVG_NS}}}polygon')
         for el in root.iter():
             el_id = el.get('id', '')
             if not el_id or el_id not in expression_dict:
@@ -1479,23 +1588,10 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
             v = expression_dict[el_id]
             if control == 'median' and median_ctrl is not None:
                 color = expression_to_color_relative(v, median_ctrl, log2_max)
-                if median_ctrl and median_ctrl > 0 and v > 0:
-                    try:
-                        log2_r = math.log2(v / median_ctrl)
-                        tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                               f"Median control: {median_ctrl:.4f}\n"
-                               f"Log\u2082 ratio: {log2_r:.4f}")
-                    except (ValueError, ZeroDivisionError):
-                        tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                               f"Median control: {median_ctrl:.4f}")
-                elif v == 0:
-                    tip = (f"{el_id}\nAvg expression: 0.0000\n"
-                           f"Median control: {median_ctrl:.4f}\n"
-                           f"Log\u2082 ratio: -\u221e (not expressed)")
-                else:
-                    tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                           f"Median control: {median_ctrl:.4f}\n"
-                           f"Log\u2082 ratio: +\u221e (control = 0)")
+                log2_r = v - median_ctrl
+                tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
+                       f"Median control: {median_ctrl:.4f}\n"
+                       f"Log fold-change: {log2_r:.4f}")
             else:
                 color = get_color(el_id)
                 tip = f"{el_id}\nAvg expression: {raw_val(el_id)}"
@@ -1503,8 +1599,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
             if not color:
                 continue
 
-            if el.tag in (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
-                          f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse'):
+            if el.tag in _lee_paint_tags:
                 set_fill(el, color, opacity)
                 add_tooltip(el, tip)
                 tag_celltype(el, ct_label)
@@ -1516,8 +1611,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 for child in el.iter():
                     if child is el:
                         continue
-                    if child.tag in (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
-                                     f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse'):
+                    if child.tag in _lee_paint_tags:
                         set_fill(child, color, opacity)
                         add_tooltip(child, tip)
                         tag_celltype(child, ct_label)
@@ -1536,10 +1630,11 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                                     control_label=_CONTROL_LABELS[control])
     elif control == 'median':
         # Seed / Lee: diverging scale centred on median of cell-type means.
+        # No reference circle here — 'median' isn't a real experimental
+        # control (unlike W0/WW/Col-0), so there's nothing to anchor a
+        # circle to.
         add_relative_legend_labeled(root, gene_name or "Expression", log2_max,
                                     control_label="Median")
-        if median_ctrl is not None:
-            add_median_circle(root, gene_name or "Expression", median_ctrl)
     else:
         add_legend(root, gene_name or "Expression", colour_ceiling)
 
@@ -1550,7 +1645,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
 # H5AD loader
 # ──────────────────────────────────────────────────────────────────────────────
 
-def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, umap_col='label_major'):
+def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, umap_col='label_majorXcondition'):
     import anndata as ad
     import numpy as np
     import pandas as pd
@@ -1786,8 +1881,6 @@ def build_umap_div(umap_df, gene_name):
     labels_all = umap_df['cell_type'].astype(str).to_numpy()
 
     cell_types = sorted(umap_df['cell_type'].astype(str).unique())
-    all_mean = float(np.mean(expr_all))
-    all_std = float(np.std(expr_all))
 
     fig = go.Figure()
 
@@ -1795,13 +1888,18 @@ def build_umap_div(umap_df, gene_name):
         x=x_all, y=y_all,
         mode='markers',
         marker=dict(
-            size=3,
+            size=6,
             color=expr_all,
             colorscale=[[0.0, '#ffff00'], [1.0, '#ff0000']],
             showscale=True,
             colorbar=dict(title=f"{gene_name}<br>Expression"),
-            opacity=0.6
+            opacity=0.6,
+            line=dict(width=0.5, color='rgba(0,0,0,0.35)')
         ),
+        # selected/unselected styling lets JS spotlight one cell type via
+        # selectedpoints without needing a separate trace per cell type.
+        selected=dict(marker=dict(opacity=0.95)),
+        unselected=dict(marker=dict(opacity=0.08)),
         customdata=np.column_stack([labels_all, expr_all]),
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>"
@@ -1819,7 +1917,7 @@ def build_umap_div(umap_df, gene_name):
             x=x_all[ct_mask], y=y_all[ct_mask],
             mode='markers',
             marker=dict(
-                size=6,
+                size=9,
                 color='#1a6fcc',
                 line=dict(width=0.5, color='#0a3d6b'),
                 opacity=1.0
@@ -1842,7 +1940,7 @@ def build_umap_div(umap_df, gene_name):
     y_max = float(np.max(y_all)) + pad
 
     buttons = [{
-        "label": f"All Cells (\u03bc={all_mean:.3f}, \u03c3={all_std:.3f})",
+        "label": "All Cells",
         "method": "update",
         "args": [
             {"visible": [True] + [False] * len(cell_types)},
@@ -1855,17 +1953,11 @@ def build_umap_div(umap_df, gene_name):
     }]
 
     for i, ct in enumerate(cell_types):
-        ct_mask = (labels_all == ct)
-        ct_expr = expr_all[ct_mask]
-        ct_n = int(np.sum(ct_mask))
-        ct_mu = float(np.mean(ct_expr)) if ct_n else float("nan")
-        ct_sigma = float(np.std(ct_expr)) if ct_n else float("nan")
-
         visible = [True] + [False] * len(cell_types)
         visible[i + 1] = True
 
         buttons.append({
-            "label": f"{ct} (n={ct_n:,}, \u03bc={ct_mu:.3f}, \u03c3={ct_sigma:.3f})",
+            "label": ct,
             "method": "update",
             "args": [
                 {"visible": visible},
@@ -1895,10 +1987,12 @@ def build_umap_div(umap_df, gene_name):
         template="plotly_white",
         showlegend=False,
         height=650,
-        margin=dict(t=60, b=40, l=40, r=40)
+        margin=dict(t=60, b=40, l=40, r=40),
+        plot_bgcolor = "#f2f2f2",
+        paper_bgcolor = "#ffffff",
     )
 
-    return fig.to_html(full_html=False, include_plotlyjs='cdn')
+    return fig.to_html(full_html=False, include_plotlyjs='cdn', div_id='umap-plot')
 
 
 def build_violin_div(umap_df, gene_name, cell_types_order=None):
@@ -2179,29 +2273,21 @@ TOOLTIP_JS = """
   }, true);
 
   function attachHoverableListeners() {
-    document.querySelectorAll('.hoverable').forEach(function(el) {
+    // Listen only on <path>/<circle> that were actually coloured (tagged
+    // 'hoverable' by add_tooltip during SVG colouring) — this excludes
+    // purely structural elements like the "outlines" and "label" groups,
+    // which are never in expression_dict and so never get tooltipped.
+    document.querySelectorAll('#svg-string path.hoverable, #svg-string circle.hoverable, #svg-string polygon.hoverable').forEach(function(el) {
       if (el.dataset.hoverBound) return;
       el.dataset.hoverBound = '1';
 
       el.addEventListener('mouseenter', function() {
-        // Find the parent <g> that groups sibling paths for this cell type
-        var group = el.closest('g');
-        if (!group) { group = el; }  // fallback: just the element itself
+        // Immediate parent <g> — this is the cell-type group
+        var group = el.parentElement;
+        if (!group || group.tagName.toLowerCase() !== 'g') return;
 
-        // Collect all hoverable siblings in the same group
-        var siblings = group.querySelectorAll('.hoverable');
-        if (siblings.length <= 1) {
-          // No siblings — might be a nested structure. Try one level up.
-          var parentG = group.parentElement ? group.parentElement.closest('g') : null;
-          if (parentG) {
-            var parentSiblings = parentG.querySelectorAll('.hoverable');
-            if (parentSiblings.length > 1) {
-              siblings = parentSiblings;
-            }
-          }
-        }
-
-        siblings.forEach(function(sib) {
+        // Highlight all direct child paths/circles in this <g>
+        group.querySelectorAll(':scope > path, :scope > circle, :scope > polygon').forEach(function(sib) {
           if (!sib.dataset.origStroke) {
             sib.dataset.origStroke = sib.getAttribute('stroke-width') || '1';
             sib.dataset.origStrokeColor = sib.getAttribute('stroke') || '';
@@ -2210,10 +2296,18 @@ TOOLTIP_JS = """
           sib.setAttribute('stroke', '#333');
           sib.classList.add('group-hover-active');
         });
+
+        // Mirror the hover onto the UMAP below (debounced — see
+        // scheduleUmapHighlight — so fast mouse movement across many
+        // SVG shapes doesn't fire a Plotly restyle per pixel).
+        // data-umap-celltype (condition-qualified, e.g. "D0_Mesophyll")
+        // takes priority over the plain data-celltype: natanella's UMAP
+        // clusters are labeled condition+celltype together, so the bare
+        // cell-type name alone ("Mesophyll") would never match a cluster.
+        scheduleUmapHighlight(el.getAttribute('data-umap-celltype') || el.getAttribute('data-celltype'));
       });
 
       el.addEventListener('mouseleave', function() {
-        // Clear all currently group-highlighted elements
         document.querySelectorAll('.group-hover-active').forEach(function(sib) {
           sib.setAttribute('stroke-width', sib.dataset.origStroke || '1');
           if (sib.dataset.origStrokeColor) {
@@ -2223,10 +2317,50 @@ TOOLTIP_JS = """
           }
           sib.classList.remove('group-hover-active');
         });
+
+        scheduleUmapHighlight(null);
       });
     });
   }
   attachHoverableListeners();
+
+  /* ── SVG-hover → UMAP highlight ─────────────────────────────────────
+     Debounced so rapidly sweeping the mouse across many SVG shapes
+     coalesces into a single Plotly.restyle call instead of one per
+     mouseenter/mouseleave, which is what actually causes the UI to
+     lag when someone hovers quickly. */
+  let __umapCellIndex = null;   // { cellType: [pointIndices...] }
+  let __umapHoverTimer = null;
+  const UMAP_HOVER_DEBOUNCE_MS = 45;
+
+  function buildUmapCellIndex() {
+    const gd = document.getElementById('umap-plot');
+    if (!gd || !gd.data || !gd.data[0] || !gd.data[0].customdata) return;
+    const cd = gd.data[0].customdata;
+    const idx = {};
+    for (let i = 0; i < cd.length; i++) {
+      const ct = cd[i][0];
+      (idx[ct] || (idx[ct] = [])).push(i);
+    }
+    __umapCellIndex = idx;
+  }
+
+  function scheduleUmapHighlight(cellType) {
+    const gd = document.getElementById('umap-plot');
+    if (!gd) return;
+    if (__umapHoverTimer) clearTimeout(__umapHoverTimer);
+    __umapHoverTimer = setTimeout(function() {
+      __umapHoverTimer = null;
+      if (!__umapCellIndex) buildUmapCellIndex();
+      if (!__umapCellIndex) return;
+      if (!cellType) {
+        Plotly.restyle(gd, { selectedpoints: [null] }, [0]);
+        return;
+      }
+      const points = __umapCellIndex[cellType] || [];
+      Plotly.restyle(gd, { selectedpoints: [points] }, [0]);
+    }, UMAP_HOVER_DEBOUNCE_MS);
+  }
 </script>
 """
 
@@ -2798,6 +2932,26 @@ def build_html(svg_string, umap_div, gene_name, active_ds_key, active_col,
             }}
           }}
         }});
+
+        // Also fade purely structural top-level groups (e.g. "outlines",
+        // "label") into the background whenever a highlight is active.
+        // These never carry data-celltype themselves (they aren't coloured
+        // cell-type data), so they're identified generically as: a direct
+        // child of the SVG root, with an id, that contains no
+        // data-celltype-tagged element anywhere inside it. This leaves the
+        // "samples" wrapper (and flat cell-type groups on datasets with no
+        // such wrapper) alone, since those DO contain data-celltype elements
+        // and are already handled per cell-type above.
+        var svgRoot = document.querySelector('#svg-string > svg');
+        if (svgRoot) {{
+          Array.from(svgRoot.children).forEach(function(el) {{
+            if (!el.id) return;
+            el.classList.remove('celltype-dim');
+            if (ct && !el.querySelector('[data-celltype]')) {{
+              el.classList.add('celltype-dim');
+            }}
+          }});
+        }}
       }}
 
       const openBtn = document.getElementById('openPopupBtn');
@@ -2906,9 +3060,33 @@ def main():
                 expression_dict, gene_name, umap_df = load_all(
                     h5ad_path, gene_list, 'CellType', None, umap_col
                 )
+            elif ds_key == 'at_seed_0d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
+                )
+            elif ds_key == 'at_rosette_21d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
+                )
             elif ds_key == 'at_shoot_zhang':
                 expression_dict, gene_name, umap_df = load_all(
                     h5ad_path, gene_list, 'celltype_after', None, umap_col
+                )
+            elif ds_key == 'at_rosette_30d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
+                )
+            elif ds_key == 'at_seedling_3d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
+                )
+            elif ds_key == 'at_seedling_6d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
+                )
+            elif ds_key == 'at_seedling_12d_lee':
+                expression_dict, gene_name, umap_df = load_all(
+                    h5ad_path, gene_list, 'CellType', None, umap_col
                 )
             else:
                 expression_dict, gene_name, umap_df = load_all(
@@ -2937,7 +3115,13 @@ def main():
                 'at_flower_lee': 'median',
                 'at_silique_lee': 'median',
                 'at_stem_lee': 'median',
+                'at_seed_0d_lee': 'median',
+                'at_rosette_21d_lee': 'median',
                 'at_shoot_zhang': 'median',
+                'at_rosette_30d_lee': 'median',
+                'at_seedling_3d_lee': 'median',
+                'at_seedling_6d_lee': 'median',
+                'at_seedling_12d_lee': 'median',
             }
             rel_control = _RELATIVE_CONTROL.get(ds_key)
             if rel_control:
@@ -3039,9 +3223,33 @@ def main():
             expression_dict, gene_name, umap_df = load_all(
                 h5ad_path, args.gene, 'CellType', None, umap_col
             )
+        elif args.ds_key == 'at_seed_0d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
+            )
+        elif args.ds_key == 'at_rosette_21d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
+            )
         elif args.ds_key == 'at_shoot_zhang':
             expression_dict, gene_name, umap_df = load_all(
                 h5ad_path, args.gene, 'celltype_after', None, umap_col
+            )
+        elif args.ds_key == 'at_rosette_30d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
+            )
+        elif args.ds_key == 'at_seedling_3d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
+            )
+        elif args.ds_key == 'at_seedling_6d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
+            )
+        elif args.ds_key == 'at_seedling_12d_lee':
+            expression_dict, gene_name, umap_df = load_all(
+                h5ad_path, args.gene, 'CellType', None, umap_col
             )
         else:
             expression_dict, gene_name, umap_df = load_all(
@@ -3070,7 +3278,13 @@ def main():
             'at_flower_lee': 'median',
             'at_silique_lee': 'median',
             'at_stem_lee': 'median',
+            'at_seed_0d_lee': 'median',
+            'at_rosette_21d_lee': 'median',
             'at_shoot_zhang': 'median',
+            'at_rosette_30d_lee': 'median',
+            'at_seedling_3d_lee': 'median',
+            'at_seedling_6d_lee': 'median',
+            'at_seedling_12d_lee': 'median',
         }
         rel_control = _RELATIVE_CONTROL.get(args.ds_key)
         if rel_control:

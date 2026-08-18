@@ -1,1 +1,1 @@
-# NSERC
+# SUPeR Viewer

@@ -33,6 +33,8 @@ For a given gene, conventional bulk RNA-seq returns one average value across an 
 
 Despite the loss of anatomical context, scRNA-seq yields information at a higher resolution by establishing gene expression profiles for individual cells. It maintains cellular heterogeneity while allowing accurate identification of the original cell types. As a result, researchers can generate large-scale datasets containing thousands to millions of cells and gene expression features, including specific gene expression profiles, cell type identities, and the distribution of cell types within a tissue.
 
+<img width="468" height="180" alt="image" src="https://github.com/user-attachments/assets/1eeeea7a-4705-416d-b776-1b0b5668f84d" />
+
 In plant scRNA-seq, there are four major steps:
 
 - Tissue dissociation and isolation
@@ -48,7 +50,9 @@ Further down the line, Illumina reads the actual tagged nucleotide sequences to 
 
 This project is described as a **pseudo-bulk viewer** because conventional bulk RNA-seq viewers take the average expression value across all cell types within a tissue. In contrast, this tool computes a separate average for each individual cell type using scRNA-seq data, so each cell type has its own color based on its expression level intensity, hence the attachment of the "pseudo-" prefix.
 
-*(Figure: Bulk ePlant viewer at the tissue level vs. pseudo-bulk SUPeR viewer at the tissue level — image omitted)*
+<img width="241" height="118" alt="image" src="https://github.com/user-attachments/assets/2a83f332-1af6-4971-81f3-7ba16806c2ca" />
+
+<img width="208" height="118" alt="image" src="https://github.com/user-attachments/assets/8a6a8311-9d3b-4c63-9917-60bf3848807b" />
 
 ---
 
@@ -56,9 +60,13 @@ This project is described as a **pseudo-bulk viewer** because conventional bulk 
 
 Use an SVG program with a graphical user interface to create an SVG from scratch. Inkscape is highly recommended, and the following steps describe this program.
 
+<img width="349" height="186" alt="image" src="https://github.com/user-attachments/assets/8d31a1aa-6237-4c38-976c-4ce6170b3d04" />
+
 Open Inkscape. If you have a reference image from which to work, open the image or paste it on the canvas.
 
 ### Document Properties Setup
+
+<img width="184" height="264" alt="image" src="https://github.com/user-attachments/assets/9473307b-d6cc-4cf7-b78d-c5240ab16d1c" />
 
 First, open **File → Document Properties** (shortcut: `CMD/CTRL + SHIFT + D`). Make the following changes:
 
@@ -73,6 +81,8 @@ First, open **File → Document Properties** (shortcut: `CMD/CTRL + SHIFT + D`).
 
 In Inkscape, you draw images with paths connected by nodes. Draw your image with the *Draw Bezier curves and straight lines* tool (shortcut: `Shift + F6`).
 
+<img width="104" height="155" alt="image" src="https://github.com/user-attachments/assets/430908cc-6963-4363-90de-8b8e5b9d7701" />
+
 Drawing with Bezier curves is the ideal method to maximize detail while minimizing the number of coordinates needed to represent the path. Begin with your first node by clicking anywhere in the canvas and continue adding nodes by subsequent clicks elsewhere in the canvas. Finish your path by either closing the path (looping back to your first node) or pressing `ESC`.
 
 If your path is closed, the path fill colour (selected through the bottom colour strip toolbar) will be enclosed within the loop. Otherwise, the fill will be enclosed in the loop that would be created when the first and last nodes are connected by a straight line.
@@ -83,13 +93,33 @@ You can select and resize your paths or reference image with the *Select and tra
 
 A decent sample layer image is necessary for making your SVG tissues. Some publications will provide a decent PNG/JPG of all their cell types in their publication; if so, you can directly adapt their image for tracing.
 
+ <img width="468" height="336" alt="image" src="https://github.com/user-attachments/assets/7f6ae683-435a-495d-97c0-8186cd57acb8" />
+
+A publication with good Arabidopsis root image (top left corner)
+
 Unfortunately, a lot of publications do not provide PNG/JPG of the cell types within their H5AD, so you would have to search the web for accurate and well-illustrated ones. Make the best attempt to find images of **TISSUES** so that it tells the structure and how multiple cell types spatially arrange relative to one another. If you cannot find entire tissues or certain cell types, you can draw the individual cell type shapes and put the shape of the entire plant as a visual reference.
 
+<img width="468" height="499" alt="image" src="https://github.com/user-attachments/assets/022e288d-4cc5-4c5d-8a94-6cf9638122b7" />
+
+An attempt to search for good anatomical image to produce SVG template
+
+<img width="468" height="306" alt="image" src="https://github.com/user-attachments/assets/ff5f0767-d0dc-48dc-a54f-c559cb1623fa" />
+
+Illustration of full plant (left) and individual cell types (right) due to a lack of quality tissue images
+
 Copying and pasting are more convenient than uploading or letting Inkscape open a file from your directory. Once pasted onto the canvas layer, you can directly trace on top of it.
+
+<img width="467" height="263" alt="image" src="https://github.com/user-attachments/assets/1a32295c-3b1b-4214-b75e-de6cbd30169b" />
+
+<img width="280" height="160" alt="image" src="https://github.com/user-attachments/assets/2d3a5360-b7bd-42a6-a342-35342ca44894" />
+
+The Bezier tool has many shortcuts. For example, holding while clicking will bend the path parabolically when you drag, but holding Shift while doing this will adjust the axis to which the parabola relatively bends.
 
 ### Grouping Tissues
 
 You will want to create paths in your SVG that will eventually be colour-filled to represent gene expression levels. To accomplish this, group all cells that are within the same tissue using **Object → Group** (shortcut: `CTRL/CMD + G`). You can select multiple by pressing `CTRL/SHIFT` and clicking on the paths.
+
+<img width="472" height="307" alt="image" src="https://github.com/user-attachments/assets/e2c57862-786d-450a-b224-8cdff61aa9a6" />
 
 Ensure you have exactly one group for every tissue type your dataset includes, including when the tissue is only represented with a single path (i.e., make sure to group tissues with only one path too).
 
@@ -97,15 +127,33 @@ Ensure you have exactly one group for every tissue type your dataset includes, i
 
 Open the XML editor with **Edit → XML Editor** (shortcut: `CTRL/CMD + SHIFT + X`).
 
+<img width="472" height="266" alt="image" src="https://github.com/user-attachments/assets/2bee060a-aa9c-46f5-80fe-c91e2e54937c" />
+
+XML panel on the bottom right section; renaming the <g> id attribute
+
 If you are unsure if the path is closed properly, try filling the group with a colour from the bottom palette bar to make sure it fills the tissue representation as expected. However, make sure to change the FILL back to none afterwards. Key steps:
 
-1. Double click on the group folder in Layers and Objects until all paths are highlighted in blue. There should be a large, dotted rectangle that includes all the paths in the group.
-2. Select a high-contrast color as the FILL on the bottom palette bar (e.g., Navy).
-3. Click the "remove fill" icon (bottom left corner) to remove fill.
+1. Double click on the group folder in Layers and Objects until all paths are highlighted in blue. There should be a large, dotted rectangle that includes all the paths in the group.(left side) <img width="558" height="308" alt="image" src="https://github.com/user-attachments/assets/a7f88f45-8711-49ad-a6e7-f4a88de4cbd1" />
+
+2. Select a high-contrast color as the FILL on the bottom palette bar (e.g., Navy). <img width="544" height="287" alt="image" src="https://github.com/user-attachments/assets/7103d8e9-dbef-4a38-b361-5a88d132e267" />
+
+3. Click the <img width="10" height="10" alt="image" src="https://github.com/user-attachments/assets/98708f42-6286-445c-a1b8-faf307072399" />
+"remove fill" icon (bottom left corner) to remove fill.
+<img width="580" height="326" alt="image" src="https://github.com/user-attachments/assets/e0f2803c-083b-4e6c-b45a-1f2945292c79" />
+
+<img width="461" height="300" alt="image" src="https://github.com/user-attachments/assets/9a294600-1524-4f7a-9e6e-e2f72a639d21" />
+
+The H5AD cell type names identical to the SVG `<g>` id attributes
+Epidermis, Mesophyll, Phloem parenchyma, and etc.
+
 
 From here, you can label your group with an ID that will then be matched to the contents of your XML file or the cell type names of the unpacked H5AD file.
 
 Ensure your id labels begin with a letter of the alphabet and do not contain any special characters (except underscore `_` to replace spaces). The distinction between space (" ") vs underscore ("_") depends on the cell type names you see while unpacking the H5AD obs metadata. For example, the H5AD file might add an underscore as "phloem_parenchyma" or directly write "phloem parenchyma".
+
+<img width="468" height="91" alt="image" src="https://github.com/user-attachments/assets/985d58d4-8bdc-4a99-b389-e2555f08cf7a" />
+
+<img width="108" height="128" alt="image" src="https://github.com/user-attachments/assets/97945e37-8e50-4249-b142-f033c25a47f1" />
 
 In this example, the H5AD uses a space for phloem parenchyma, thus "Phloem parenchyma" should be the ID name in the SVG to ensure seamless coloring. **In short, ALWAYS unpack the H5AD files and match SVG IDs with H5AD cell types to prevent further headaches down the line.**
 
@@ -113,14 +161,26 @@ In this example, the H5AD uses a space for phloem parenchyma, thus "Phloem paren
 
 ### Removing Transforms
 
-Follow the linked instructions (in original doc) to download Klowner's Inkscape *Apply Transform* tool at GitHub (you will need to restart Inkscape the first time you download this to use this tool). Deselect any selections you currently have and apply the tool through **Extensions → Modify Path → Apply Transform**. This removes transformations in every group by having their children inherit their transformations. This step is necessary because ePlant can only parse SVG tissue groups without transforms.
+Follow the <a href="https://github.com/Klowner/inkscape-applytransforms">linked instructions </a> to download Klowner's Inkscape *Apply Transform* tool at GitHub (you will need to restart Inkscape the first time you download this to use this tool). Deselect any selections you currently have and apply the tool through **Extensions → Modify Path → Apply Transform**. This removes transformations in every group by having their children inherit their transformations. This step is necessary because ePlant can only parse SVG tissue groups without transforms.
 
 - **Note:** It is very possible to have H5AD-to-SVG cell type mismatches (e.g., "Dividing" and "Unknown" categories not represented visually). You should always try your best to include all cell types from the H5AD. It is acceptable to omit a cell type if you really struggle to find a good cell type image, or if the author explicitly asks not to include it. One solution is simply drawing a circle with the cell type caption underneath.
+
+<img width="105" height="101" alt="image" src="https://github.com/user-attachments/assets/c8f18dc0-54b8-4776-bd6f-84a776efbe03" />
+
 - **Note:** The *Apply Transform* tool requires all objects and shapes in the SVG to be paths, so you might get a warning that all elements need to be paths before transformation. To convert everything to a path, select all elements and go **Path → Object to Path** (shortcut: `CTRL/CMD + SHIFT + C`).
+
+<img width="361" height="198" alt="image" src="https://github.com/user-attachments/assets/698ec336-acd1-4f8b-9c35-1fabc683be35" />
+
+“Apply Transform” with no selections will apply transforms directly to the paths of the entire SVG. With selections, it will apply transforms only to the paths within the selection.
+
+<img width="298" height="203" alt="image" src="https://github.com/user-attachments/assets/70fa001f-2052-4669-bf94-05c0981dc9ea" />
+<img width="159" height="213" alt="image" src="https://github.com/user-attachments/assets/8ef47a37-ab5c-4607-911d-373e4c70267e" />
 
 "Apply Transform" with no selections will apply transforms directly to the paths of the entire SVG. With selections, it will apply transforms only to the paths within the selection.
 
 ### Canonical ePlant SVG Structure
+
+<img width="586" height="422" alt="image" src="https://github.com/user-attachments/assets/efb68656-ea18-4b88-b53a-edbbc50a885e" />
 
 To produce an SVG that complies with the ePlant standard, complete the following:
 
@@ -175,6 +235,10 @@ xmlns="http://www.w3.org/2000/svg">
 
 Save your file normally under a different name, then save again under another different name as an **Optimized SVG** (under the "Save as type:" dropdown menu). You will be prompted to select parameters for your Optimized SVG. Recommended settings:
 
+<img width="152" height="157" alt="image" src="https://github.com/user-attachments/assets/2e105c07-c50e-4173-b5d6-c23f110aa070" />
+<img width="152" height="157" alt="image" src="https://github.com/user-attachments/assets/d77b70a8-62ac-4c26-90dd-0dd7aa957664" />
+<img width="152" height="156" alt="image" src="https://github.com/user-attachments/assets/0faf724f-147b-442c-8972-fbaec1fad449" />
+
 - Remove metadata: ✔
 - Embed raster images: ✔
 - Format output with line-breaks and indentation: ✔
@@ -186,6 +250,14 @@ Save your file normally under a different name, then save again under another di
 **Note:** *Convert CSS attributes to XML attributes* matters because a leftover inline `style="fill:#..."` overrides the attribute the viewer sets, and the tissue then never colors.
 
 Lastly, open the SVG product in the browser and view page source. Since it is optimized, the SVG should **NOT** contain information relevant to Inkscape or `transform="..."` (double check this with `CMD/CTRL + F`). The product should be clean and minimalistic.
+
+<img width="468" height="262" alt="image" src="https://github.com/user-attachments/assets/f5dd5a6b-5b0c-4d46-a2d9-8ece0da2c3ee" />
+
+As a reference, here is what it looks like WITHOUT the optimizations below, so you know what to avoid:
+
+<img width="468" height="243" alt="image" src="https://github.com/user-attachments/assets/e16fa21c-8fd0-4e97-9d16-286db9fe96e3" />
+
+Viola! You can now move on to the next step of SVG coloring.
 
 ---
 
@@ -372,11 +444,17 @@ Top 1 candidates, ranked by vocabulary match + column-name hints + cardinality:
     sample values: ['Epidermal', 'Guard', 'Meristematic', 'Mesophyll', 'Stele']
 ```
 
+<img width="328" height="204" alt="image" src="https://github.com/user-attachments/assets/4ae7350f-6220-4f58-9dbb-d27e218047fe" />
+
 ### How Can I Convert from Raw Counts and Z-Score to Log-Normalization?
 
 As a great man of science once said, data is dirty in the real world.
 
 While working with different datasets from many publications, the H5AD CellxGene matrix expression values might be manipulated in different ways, but the SUPeR viewer requires library-size log-normalization.
+
+<img width="115" height="113" alt="image" src="https://github.com/user-attachments/assets/7493b63b-fb94-477f-895c-d5b86b163e1a" />
+<img width="144" height="113" alt="image" src="https://github.com/user-attachments/assets/a1fb1de6-33fc-4784-b984-1fab51ba4106" />
+<img width="177" height="113" alt="image" src="https://github.com/user-attachments/assets/58bd3764-b73e-4a64-a5fd-8155f193e84b" />
 
 #### Command Line Usage
 

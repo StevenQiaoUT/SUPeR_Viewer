@@ -603,15 +603,18 @@ if sp.issparse(adata.X):
 - Arabidopsis Flower (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
   - flower image source: https://link.springer.com/article/10.1007/s00497-018-0324-7 
 - Arabidopsis Silique (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+  - silique image source: https://www.sciencedirect.com/science/chapter/bookseries/abs/pii/S0091679X2030128X
+  - silique image source: https://seedgenes.org/Tutorial.html
 - Arabidopsis Stem (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
   - epidermis image source: https://academic.oup.com/aob/article/128/2/137/6240180?login=true
 - Arabidopsis Seed — 0 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+  - Ovule image source: https://link.springer.com/article/10.1007/s00497-017-0304-3   
 - Arabidopsis Rosette — 21 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
-- Arabidopsis Shoot (Zhang et al., 2021): https://www.cell.com/developmental-cell/fulltext/S1534-5807(21)00161-1
 - Arabidopsis Rosette — 30 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
 - Arabidopsis Seedling — 3 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
 - Arabidopsis Seedling — 6 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
 - Arabidopsis Seedling — 12 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Shoot (Zhang et al., 2021): https://www.cell.com/developmental-cell/fulltext/S1534-5807(21)00161-1
 
 ## License
 

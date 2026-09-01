@@ -133,7 +133,9 @@ XML panel on the bottom right section; renaming the <g> id attribute
 
 If you are unsure if the path is closed properly, try filling the group with a colour from the bottom palette bar to make sure it fills the tissue representation as expected. However, make sure to change the FILL back to none afterwards. Key steps:
 
-1. Double click on the group folder in Layers and Objects until all paths are highlighted in blue. There should be a large, dotted rectangle that includes all the paths in the group.(left side) <img width="558" height="308" alt="image" src="https://github.com/user-attachments/assets/a7f88f45-8711-49ad-a6e7-f4a88de4cbd1" />
+1. Double click on the group folder in Layers and Objects until all paths are highlighted in blue. There should be a large, dotted rectangle that includes all the paths in the group.(left side)
+
+<img width="558" height="308" alt="image" src="https://github.com/user-attachments/assets/a7f88f45-8711-49ad-a6e7-f4a88de4cbd1" />
 
 2. Select a high-contrast color as the FILL on the bottom palette bar (e.g., Navy). <img width="544" height="287" alt="image" src="https://github.com/user-attachments/assets/7103d8e9-dbef-4a38-b361-5a88d132e267" />
 

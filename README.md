@@ -13,6 +13,6 @@ I would like to acknowledge Prof. Nicholas J. Provart, Vincent Lau, Asher Pasha,
 ## Contact
 
 Steven Qiao — University of Toronto
-- Course: BCB330Y (Bioinformatics and Computational Biology Research)
+- NSERC USRA Award
 - Lab: Provart Lab, Department of Cell & Systems Biology
 - Email: steven.qiao@mail.utoronto.ca

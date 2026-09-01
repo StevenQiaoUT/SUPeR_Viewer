@@ -594,6 +594,25 @@ if sp.issparse(adata.X):
 
 ## References and Publications
 
+- ePlant / BAR: https://bar.utoronto.ca
+- ggPlantmap: https://github.com/leonardojo/ggPlantmap
+- Arabidopsis Drought (Illouz-Eliaz et al., 2025): https://www.nature.com/articles/s41467-025-63467-2
+- Rice Drought-Salinity (Robertson et al., 2026): *publication not yet released*
+- Arabidopsis Root (Shahan et al., 2022): https://www.cell.com/developmental-cell/fulltext/S1534-5807(22)00033-8
+- Arabidopsis Seed (Martin et al., 2026): https://www.nature.com/articles/s41477-026-02295-8
+- Arabidopsis Flower (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+  - flower image source: https://link.springer.com/article/10.1007/s00497-018-0324-7 
+- Arabidopsis Silique (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Stem (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+  - epidermis image source: https://academic.oup.com/aob/article/128/2/137/6240180?login=true
+- Arabidopsis Seed — 0 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Rosette — 21 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Shoot (Zhang et al., 2021): https://www.cell.com/developmental-cell/fulltext/S1534-5807(21)00161-1
+- Arabidopsis Rosette — 30 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Seedling — 3 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Seedling — 6 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+- Arabidopsis Seedling — 12 DAP (Lee et al., 2025): https://www.nature.com/articles/s41477-025-02072-z
+
 ## License
 
 MIT License

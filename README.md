@@ -1,4 +1,4 @@
-# SUPeR Viewer
+# ScRNA-seq UMAP & Pseudo-spatial eFP BrowseR (SUPeR) Viewer
 
 ## Table of Contents
 

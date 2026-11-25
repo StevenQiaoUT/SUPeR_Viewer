@@ -14,6 +14,13 @@ Output files (one per dataset):
     arabidopsis_flower_lee_pseudobulk_dump.sql
     arabidopsis_silique_lee_pseudobulk_dump.sql
     arabidopsis_stem_lee_pseudobulk_dump.sql
+    arabidopsis_seed_0d_lee_pseudobulk_dump.sql
+    arabidopsis_rosette_21d_lee_pseudobulk_dump.sql
+    arabidopsis_shoot_zhang_pseudobulk_dump.sql
+    arabidopsis_rosette_30d_lee_pseudobulk_dump.sql
+    arabidopsis_seedling_3d_lee_pseudobulk_dump.sql
+    arabidopsis_seedling_6d_lee_pseudobulk_dump.sql
+    arabidopsis_seedling_12d_lee_pseudobulk_dump.sql
 
 Usage:
     python generate_pseudobulk_dumps.py
@@ -24,6 +31,13 @@ Usage:
     python generate_pseudobulk_dumps.py --ds at_flower
     python generate_pseudobulk_dumps.py --ds at_silique
     python generate_pseudobulk_dumps.py --ds at_stem
+    python generate_pseudobulk_dumps.py --ds at_seed_0d_lee
+    python generate_pseudobulk_dumps.py --ds at_rosette_21d_lee
+    python generate_pseudobulk_dumps.py --ds at_shoot_zhang
+    python generate_pseudobulk_dumps.py --ds at_rosette_30d_lee
+    python generate_pseudobulk_dumps.py --ds at_seedling_3d_lee
+    python generate_pseudobulk_dumps.py --ds at_seedling_6d_lee
+    python generate_pseudobulk_dumps.py --ds at_seedling_12d_lee
     python generate_pseudobulk_dumps.py --outdir /path/to/output/
 
 Dataset-specific notes
@@ -66,6 +80,18 @@ at_flower / at_silique / at_stem:
     Keys are CellType obs values, matching SVG element IDs directly.
     X matrix may be empty; falls back to logcounts layer automatically.
 
+at_seed_0d_lee / at_rosette_21d_lee / at_shoot_zhang / at_rosette_30d_lee /
+at_seedling_3d_lee / at_seedling_6d_lee / at_seedling_12d_lee:
+    Newly wired-in datasets, added from dataset_config.yaml with no code
+    changes needed here beyond registering their ds_keys below — the
+    per-dataset h5ad path / cell_type_col / use_logcounts / db_name all
+    come from the shared config. Each is single-column (no condition or
+    genotype), so cell_type_col2 is None and there's no combined-key or
+    post_process step: unique_cts is just the raw CellType (or
+    celltype_after, for Zhang) values, plus Mean_CTRL. No dedicated
+    relative-view baseline existed for these before; Mean_CTRL (see
+    below) now provides one automatically, same as every other dataset.
+
 The script uses chunked computation (CHUNK=500 genes at a time) to
 avoid out-of-memory errors on large datasets.
 
@@ -93,83 +119,30 @@ import warnings
 from datetime import datetime
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dataset_config"))
+from dataset_config import (
+    pseudobulk_columns, resolve_ds_key, pseudobulk_ready_keys,
+    ROOT_GENO_PREFIX, ROOT_H5AD_TO_ID,
+)
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Dataset config  (mirrors DATASETS dict in mini_app.py)
+# Dataset config now lives in dataset_config.yaml (see dataset_config.py),
+# shared with mini_app.py and generate_umap_dumps.py. --ds still accepts
+# the original short keys below (arabidopsis, at_root, ...); they're
+# resolved to the canonical ds_key via legacy_key_aliases in the YAML.
 # ──────────────────────────────────────────────────────────────────────────────
 
-DATASETS = {
-    # ── Illouz-Eliaz drought leaf ─────────────────────────────────────────────
-    "arabidopsis": {
-        "db_name": "arabidopsis_NIE_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/arabidopsis_nat.h5ad",
-        "cell_type_col": "label_majorXcondition",
-        "cell_type_col2": None,
-        "gene_id_col": "TAIR_ID",
-    },
+_DS_CHOICES = ["arabidopsis", "rice", "at_root", "at_seed",
+               "at_flower", "at_silique", "at_stem"]
 
-    # ── Robertson rice stress ─────────────────────────────────────────────────
-    "rice": {
-        "db_name": "rice_OW_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/RiceOW.h5ad",
-        "cell_type_col": "CellAnnotation",
-        "cell_type_col2": "Condition",    # combined: "{Condition}_{CellAnnotation}"
-        "gene_id_col": None,
-    },
-
-    # ── Shahan root ───────────────────────────────────────────────────────────
-    # compute_pseudobulk() produces raw "{Genotype}_{Celltype}" keys.
-    # post_process_root() then expands these to SVG element IDs (54 total)
-    # following the same h5ad_to_id mapping + synthetic xylem/phloem logic
-    # that mini_app.py applies at query time.
-    "at_root": {
-        "db_name": "arabidopsis_root_rs_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_root_shahan.h5ad",
-        "cell_type_col": "Celltype",
-        "cell_type_col2": "Genotype",     # raw combined: "{Genotype}_{Celltype}"
-        "gene_id_col": None,
-        "post_process": "root",           # triggers post_process_root()
-    },
-
-    # ── Martin seed ───────────────────────────────────────────────────────────
-    "at_seed": {
-        "db_name": "arabidopsis_seed_martin_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_martin.h5ad",
-        "cell_type_col": "level_2_annotation_timed",
-        "cell_type_col2": None,
-        "gene_id_col": None,
-    },
-
-    # ── Lee flower ────────────────────────────────────────────────────────────
-    "at_flower": {
-        "db_name": "arabidopsis_flower_lee_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_flower_lee.h5ad",
-        "cell_type_col": "CellType",
-        "cell_type_col2": None,
-        "gene_id_col": None,
-        "use_logcounts": True,
-    },
-
-    # ── Lee silique ───────────────────────────────────────────────────────────
-    "at_silique": {
-        "db_name": "arabidopsis_silique_lee_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_silique_lee.h5ad",
-        "cell_type_col": "CellType",
-        "cell_type_col2": None,
-        "gene_id_col": None,
-        "use_logcounts": True,
-    },
-
-    # ── Lee stem ──────────────────────────────────────────────────────────────
-    "at_stem": {
-        "db_name": "arabidopsis_stem_lee_pseudobulk",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_stem_lee.h5ad",
-        "cell_type_col": "CellType",
-        "cell_type_col2": None,
-        "gene_id_col": None,
-        "use_logcounts": True,
-    },
-}
+# Newly wired-in datasets (see dataset_config.yaml) — registered under
+# their canonical ds_key directly, since none of them has a legacy short
+# alias the way the original 7 above do.
+_DS_CHOICES += [
+    "at_seed_0d_lee", "at_rosette_21d_lee", "at_shoot_zhang",
+    "at_rosette_30d_lee", "at_seedling_3d_lee", "at_seedling_6d_lee",
+    "at_seedling_12d_lee",
+]
 
 # data_bot_id used for the synthetic "average across all cells" row that is
 # now added to every dataset (see Mean_CTRL note in the module docstring).
@@ -186,48 +159,13 @@ PHLOEM_AVERAGE_RULES = [
 # Root dataset post-processing
 # ──────────────────────────────────────────────────────────────────────────────
 
-# Mirrors the h5ad_to_id dict in mini_app.py load_all (Genotype branch).
-# Keys: "{Genotype}_{Celltype}" as they appear in the obs columns.
-# Values: list of SVG element IDs that should all receive the same value.
-_ROOT_H5AD_TO_ID = {
-    'Col-0 (shr2)_Root endodermis':      ['shr2_top_endodermis', 'shr2_side_endodermis', 'shr2_tip_endodermis'],
-    'Col-0 (shr2)_Collumella root cap':  ['shr2_tip_columella'],
-    'Col-0 (shr2)_Lateral root cap':     ['shr2_tip_lateral_root_cap'],
-    'Col-0 (shr2)_Phloem':               ['shr2_top_phloem', 'shr2_side_phloem'],  # overwritten below
-    'Col-0 (shr2)_Root procambium':      ['shr2_top_procambium', 'shr2_side_procambium'],
-    'Col-0 (shr2)_Root cortex':          ['shr2_tip_cortex', 'shr2_top_cortex', 'shr2_side_cortex'],
-    'Col-0 (shr2)_Xylem pole pericycle': ['shr2_xpp_circle'],
-    'Col-0 (shr2)_Protoxylem':           ['shr2_proto_circle'],
-    'Col-0 (shr2)_Phloem pole pericycle':['shr2_ppp_circle'],
-    'Col-0 (shr2)_Metaxylem':            ['shr2_meta_circle'],
-    'Ler (scr4)_Root endodermis':        ['scr4_top_endodermis', 'scr4_side_endodermis', 'scr4_tip_endodermis'],
-    'Ler (scr4)_Collumella root cap':    ['scr4_tip_columella'],
-    'Ler (scr4)_Lateral root cap':       ['scr4_tip_lateral_root_cap'],
-    'Ler (scr4)_Phloem':                 ['scr4_top_phloem', 'scr4_side_phloem'],  # overwritten below
-    'Ler (scr4)_Root procambium':        ['scr4_top_procambium', 'scr4_side_procambium'],
-    'Ler (scr4)_Root cortex':            ['scr4_tip_cortex', 'scr4_top_cortex', 'scr4_side_cortex'],
-    'Ler (scr4)_Xylem pole pericycle':   ['scr4_xpp_circle'],
-    'Ler (scr4)_Protoxylem':             ['scr4_proto_circle'],
-    'Ler (scr4)_Phloem pole pericycle':  ['scr4_ppp_circle'],
-    'Ler (scr4)_Metaxylem':              ['scr4_meta_circle'],
-    'Col-0_Root endodermis':             ['col0_top_endodermis', 'col0_side_endodermis', 'col0_tip_endodermis'],
-    'Col-0_Collumella root cap':         ['col0_tip_columella'],
-    'Col-0_Lateral root cap':            ['col0_tip_lateral_root_cap'],
-    'Col-0_Phloem':                      ['col0_top_phloem', 'col0_side_phloem'],  # overwritten below
-    'Col-0_Root procambium':             ['col0_top_procambium', 'col0_side_procambium'],
-    'Col-0_Root cortex':                 ['col0_tip_cortex', 'col0_top_cortex', 'col0_side_cortex'],
-    'Col-0_Xylem pole pericycle':        ['col0_xpp_circle'],
-    'Col-0_Protoxylem':                  ['col0_proto_circle'],
-    'Col-0_Phloem pole pericycle':       ['col0_ppp_circle'],
-    'Col-0_Metaxylem':                   ['col0_meta_circle'],
-}
-
-# Genotype prefix in SVG IDs for each obs Genotype value.
-_ROOT_GENO_PREFIX = {
-    'Col-0 (shr2)': 'shr2',
-    'Ler (scr4)':   'scr4',
-    'Col-0':        'col0',
-}
+# _ROOT_H5AD_TO_ID / _ROOT_GENO_PREFIX now come from dataset_config.yaml
+# (root_h5ad_to_svg_ids / root_genotype_prefix) via the imports above —
+# this used to be a local copy that generate_umap_dumps.py and mini_app.py
+# each hardcoded separately, with a comment reminding you to keep them in
+# sync by hand.
+_ROOT_H5AD_TO_ID = ROOT_H5AD_TO_ID
+_ROOT_GENO_PREFIX = ROOT_GENO_PREFIX
 
 
 def post_process_root(gene_ids, raw_cell_types, avg_matrix, std_matrix):
@@ -763,7 +701,7 @@ def main():
     )
     parser.add_argument(
         "--ds",
-        choices=list(DATASETS.keys()) + ["all"],
+        choices=_DS_CHOICES + ["all"],
         default="all",
         help="Which dataset to process (default: all)",
     )
@@ -799,17 +737,17 @@ def main():
     compute_std = not args.no_std
     add_mean_ctrl = not args.no_mean_ctrl
 
-    ds_keys = list(DATASETS.keys()) if args.ds == "all" else [args.ds]
+    ds_keys = _DS_CHOICES if args.ds == "all" else [args.ds]
 
     for ds_key in ds_keys:
-        cfg = DATASETS[ds_key]
+        cfg = pseudobulk_columns(ds_key)
         db_name        = cfg["db_name"]
         h5ad_path      = cfg["h5ad"]
         cell_type_col  = cfg["cell_type_col"]
         cell_type_col2 = cfg["cell_type_col2"]
         gene_id_col    = cfg["gene_id_col"]
-        use_logcounts  = cfg.get("use_logcounts", False)
-        post_process   = cfg.get("post_process", None)
+        use_logcounts  = cfg["use_logcounts"]
+        post_process   = cfg["post_process"]
 
         print(f"\n{'=' * 60}", file=sys.stderr)
         print(f"Processing dataset: {ds_key} -> {db_name}", file=sys.stderr)
@@ -845,7 +783,7 @@ def main():
 
         # ── Arabidopsis leaf: append synthetic phloem average rows ────────────
         phloem_extras = None
-        if ds_key == "arabidopsis":
+        if resolve_ds_key(ds_key) == "arabidopsis_nat":
             phloem_extras = build_phloem_averages(cell_types, avg_matrix, std_matrix)
 
         ext = ".sql.gz" if args.gzip else ".sql"

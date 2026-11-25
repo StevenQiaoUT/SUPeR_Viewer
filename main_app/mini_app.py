@@ -1,4 +1,4 @@
-#!/mnt/home/sqiao/venv/bin/python3
+#!/usr/bin/env python3
 """
 eFP Viewer — CGI Script
 ========================
@@ -27,6 +27,35 @@ import re
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ──────────────────────────────────────────────────────────────────────────────
+# LOCAL MODE — BAR_API on Docker localhost
+# ──────────────────────────────────────────────────────────────────────────────
+
+BAR_API_BASE = "http://localhost:5000"
+
+# Resolve SVG templates relative to this script's directory when running locally
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Map dataset key → (expression database name, umap database name | None)
+# Database names = SQL dump filenames without .sql
+# Set umap db to None if no UMAP dump is loaded for that dataset yet.
+API_DATABASE_MAP = {
+    "arabidopsis_nat": ("arabidopsis_NIE_pseudobulk", "arabidopsis_NIE_umap"),
+    "rice":            ("rice_OW_pseudobulk",         "rice_OW_umap"),
+    "at_root_rs":      ("arabidopsis_root_rs_pseudobulk", "arabidopsis_root_shahan_umap"),
+    "at_seed_martin":  ("arabidopsis_seed_martin_pseudobulk", "arabidopsis_seed_martin_umap"),
+    "at_flower_lee":   ("arabidopsis_flower_lee_pseudobulk", "arabidopsis_flower_lee_umap"),
+    "at_silique_lee":  ("arabidopsis_silique_lee_pseudobulk", "arabidopsis_silique_lee_umap"),
+    "at_stem_lee":     ("arabidopsis_stem_lee_pseudobulk", "arabidopsis_stem_lee_umap"),
+    "at_shoot_zhang":  ("arabidopsis_shoot_zhang_pseudobulk", "arabidopsis_shoot_zhang_umap"),
+    "at_seed_0d_lee":      ("arabidopsis_seed_0d_lee_pseudobulk", "arabidopsis_seed_0d_lee_umap"),
+    "at_rosette_21d_lee":  ("arabidopsis_rosette_21d_lee_pseudobulk", "arabidopsis_rosette_21d_lee_umap"),
+    "at_rosette_30d_lee":  ("arabidopsis_rosette_30d_lee_pseudobulk", "arabidopsis_rosette_30d_lee_umap"),
+    "at_seedling_3d_lee":  ("arabidopsis_seedling_3d_lee_pseudobulk", "arabidopsis_seedling_3d_lee_umap"),
+    "at_seedling_6d_lee":  ("arabidopsis_seedling_6d_lee_pseudobulk", "arabidopsis_seedling_6d_lee_umap"),
+    "at_seedling_12d_lee": ("arabidopsis_seedling_12d_lee_pseudobulk", "arabidopsis_seedling_12d_lee_umap"),
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Dataset registry — all server-side config lives here, never in the URL
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -34,99 +63,122 @@ DATASETS = {
     "arabidopsis_nat": {
         "label": "Arabidopsis Drought (Illouz-Eliaz et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/arabidopsis_nat.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_natanella.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/illouz-eliaz_2025_at.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "illouz-eliaz_2025_at.svg"),
         "umap_col": "label_majorXcondition",
         "opacity": 1.0,
     },
     "rice": {
         "label": "Rice Drought-Salinity (Robertson et al., 2026)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/RiceOW.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/rice_template_ow.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/robertson_2026_rice.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "robertson_2026_rice.svg"),
         "umap_col": "CellAnnotation",
         "opacity": 1.0,
     },
     "at_root_rs": {
         "label": "Arabidopsis Root (Shahan et al., 2022)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_root_shahan.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_root_template_shahan.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/shahan_2022_at_root.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "shahan_2022_at_root.svg"),
         "umap_col": "Celltype",
         "opacity": 1.0,
     },
     "at_seed_martin": {
         "label": "Arabidopsis Seed (Martin et al., 2026)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_martin.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seed_template_martin.svg",
-        "svg_l3": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seed_l3_template_martin.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/martin_2026_at_seed.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "martin_2026_at_seed.svg"),
+        "svg_l3": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/martin_2026_at_seed_l3.svg",
+        "svg_l3_local": os.path.join(_SCRIPT_DIR, "martin_2026_at_seed_l3.svg"),
         "umap_col": "level_2_annotation_timed",
         "opacity": 1.0,
     },
     "at_flower_lee": {
         "label": "Arabidopsis Flower (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_flower_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_flower_template_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_flower.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_flower.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_silique_lee": {
         "label": "Arabidopsis Silique (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_silique_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_silique_template_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_silique.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_silique.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_stem_lee": {
         "label": "Arabidopsis Stem (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_stem_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_stem_template_lee.svg",
-        "umap_col": "CellType",
-        "opacity": 1.0,
-    },
-    "at_seed_0d_lee": {
-        "label": "Arabidopsis Seed — 0 DAP (Lee et al., 2025)",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_0d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seed_0d_lee.svg",
-        "umap_col": "CellType",
-        "opacity": 1.0,
-    },
-    "at_rosette_21d_lee": {
-        "label": "Arabidopsis Rosette — 21 DAP (Lee et al., 2025)",
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_rosette_21d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_rosette_21d_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_stem.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_stem.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_shoot_zhang": {
         "label": "Arabidopsis Shoot (Zhang et al., 2021)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_shoot_zhang.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_shoot_zhang.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/zhang_2021_at_shoot.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "zhang_2021_at_shoot.svg"),
         "umap_col": "celltype_after",
+        "opacity": 1.0,
+    },
+    # ── NEW — added alongside their pseudobulk/umap dumps. h5ad/svg paths
+    # here follow the same local naming pattern as at_flower_lee /
+    # at_silique_lee / at_stem_lee above (ds_key + ".h5ad",
+    # "at_{tissue}_template_lee.svg") but are UNVERIFIED guesses — I don't
+    # have visibility into the actual local file layout, so confirm these
+    # against whatever files actually exist under _SCRIPT_DIR / the h5ad
+    # dir before relying on CGI/CLI mode for these datasets. --local mode
+    # (load_all_from_api) doesn't need h5ad at all, only svg_local.
+    "at_seed_0d_lee": {
+        "label": "Arabidopsis Seed — 0 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_0d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seed_0d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_seed_0d.svg"),
+        "umap_col": "CellType",
+        "opacity": 1.0,
+    },
+    "at_rosette_21d_lee": {
+        "label": "Arabidopsis Rosette — 21 DAP (Lee et al., 2025)",
+        "h5ad": "/mnt/home/sqiao/h5ad_files/at_rosette_21d_lee.h5ad",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_rosette_21d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_rosette_21d.svg"),
+        "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_rosette_30d_lee": {
         "label": "Arabidopsis Rosette — 30 DAP (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_rosette_30d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_rosette_30d_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_rosette_30d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_rosette_30d.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_seedling_3d_lee": {
         "label": "Arabidopsis Seedling — 3 DAP (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_3d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_3d_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_3d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_seedling_3d.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_seedling_6d_lee": {
         "label": "Arabidopsis Seedling — 6 DAP (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_6d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_6d_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_6d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_seedling_6d.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
     "at_seedling_12d_lee": {
         "label": "Arabidopsis Seedling — 12 DAP (Lee et al., 2025)",
         "h5ad": "/mnt/home/sqiao/h5ad_files/at_seedling_12d_lee.h5ad",
-        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/at_seedling_12d_lee.svg",
+        "svg": "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_12d.svg",
+        "svg_local": os.path.join(_SCRIPT_DIR, "lee_2025_at_seedling_12d.svg"),
         "umap_col": "CellType",
         "opacity": 1.0,
     },
@@ -156,14 +208,14 @@ DATASET_COLUMNS = {
     "at_stem_lee": {
         "CellType": "cell type",
     },
+    "at_shoot_zhang": {
+        "celltype_after": "cell type",
+    },
     "at_seed_0d_lee": {
         "CellType": "cell type",
     },
     "at_rosette_21d_lee": {
         "CellType": "cell type",
-    },
-    "at_shoot_zhang": {
-        "celltype_after": "cell type",
     },
     "at_rosette_30d_lee": {
         "CellType": "cell type",
@@ -184,20 +236,14 @@ COLUMNS = {k: k for cols in DATASET_COLUMNS.values() for k in cols}
 # Default gene shown in the Gene ID box when each dataset is selected from
 # the dropdown. Keyed by DATASETS key (i.e. the same key used by ds-select).
 DATASET_DEFAULT_GENES = {
-    "arabidopsis_nat": "SZF1",  # Illouz-Eliaz — SZF1/AT3G55980
+    "arabidopsis_nat": "AT3G55980",  # Illouz-Eliaz — SZF1
     "rice": "Os10g0168500",  # Rice (Wilkins/Roberston)
     "at_root_rs": "AT1G79580",  # Shahan
     "at_seed_martin": "AT2G42840",  # Martin
     "at_flower_lee": "AT3G15510",  # Lee — flower
     "at_silique_lee": "AT3G24140",  # Lee — silique
     "at_stem_lee": "AT5G26000",  # Lee — stem
-    "at_seed_0d_lee": "AT1G01010",  # Lee — seed 0 DAP — TODO: replace with a real marker gene
-    "at_rosette_21d_lee": "AT1G01010",  # Lee — rosette 21 DAP — TODO: replace with a real marker gene
     "at_shoot_zhang": "AT1G65480",  # Zhang — shoot
-    "at_rosette_30d_lee": "AT1G01010",  # Lee — rosette 30 DAP — TODO: replace with a real marker gene
-    "at_seedling_3d_lee": "AT1G01010",  # Lee — seedling 3 DAP — TODO: replace with a real marker gene
-    "at_seedling_6d_lee": "AT1G01010",  # Lee — seedling 6 DAP — TODO: replace with a real marker gene
-    "at_seedling_12d_lee": "AT1G01010",  # Lee — seedling 12 DAP — TODO: replace with a real marker gene
 }
 
 # Curated marker genes per dataset — shown as autocomplete suggestions
@@ -246,15 +292,6 @@ DATASET_MARKER_GENES = {
         {"gene": "AT2G37260", "label": "AT2G37260 — guard"},
         {"gene": "AT1G07640", "label": "AT1G07640 — trichome"},
     ],
-    "at_seed_0d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Epidermal, Guard, Meristematic, Seed_coat, Stele)
-    ],
-    "at_rosette_21d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Epidermal, Guard, Stele are drawn in the SVG; Meristematic and
-        # Unannotated exist in obs but have no corresponding SVG shape)
-    ],
     "at_shoot_zhang": [
         {"gene": "AT1G11840", "label": "AT1G11840 — shoot apical meristem"},
         {"gene": "AT1G01090", "label": "AT1G01090 — mesophyll"},
@@ -262,30 +299,10 @@ DATASET_MARKER_GENES = {
         {"gene": "AT2G25810", "label": "AT2G25810 — guard cells"},
         {"gene": "AT1G12880", "label": "AT1G12880 — companion cells"},
     ],
-    "at_rosette_30d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Epidermal, Guard, Meristematic, Mesophyll, Stele; Unannotated
-        # exists in obs but has no corresponding SVG shape)
-    ],
-    "at_seedling_3d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Vascular, Mesophyll, Epidermis, Phloem, Dividing, Trichoblast,
-        # Phloem parenchyma; Unknown exists in obs but has no corresponding
-        # SVG shape)
-    ],
-    "at_seedling_6d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Epidermal, Stele, Mesophyll, Meristematic, Guard all drawn in the SVG)
-    ],
-    "at_seedling_12d_lee": [
-        # TODO: replace with real marker genes for this dataset's cell types
-        # (Epidermal, Mesophyll, Stele, Guard drawn in the SVG; Unannotated
-        # exists in obs but has no corresponding SVG shape)
-    ],
 }
 
 DEFAULT_DATASET = "arabidopsis_nat"
-DEFAULT_GENE = "SZF1"
+DEFAULT_GENE = "AT3G55980"
 DEFAULT_COLUMN = "label_majorXcondition"
 
 _SEED_SKIP_IDS = {
@@ -297,6 +314,64 @@ _SEED_SKIP_IDS = {
     "3DAP", "5DAP", "7DAP",
     "top_bar", "layer1",
 }
+# SVG ids may now be space- or underscore-joined depending on when the
+# template was exported/edited; match either spelling against the skip set.
+_SEED_SKIP_IDS |= {s.replace(' ', '_') for s in _SEED_SKIP_IDS}
+
+# The pseudobulk DB reports fine-grained seed-compartment codes for every
+# timepoint (e.g. "3DAP MCE", "3DAP CZE", "3DAP ii1"). The 5DAP/7DAP SVG
+# panels were drawn using those exact codes as group ids, so they match the
+# DB directly. The 3DAP panel, however, was drawn with only five coarse
+# shapes (Endosperm / Embryo / Seed coat / Funiculus / Ovule) — there is no
+# "3DAP Endosperm" row in the DB, only its constituent fine compartments.
+# This maps each fine 3DAP DB code to the coarse SVG group id that
+# represents it, so color_svg can average the fine values into the shape
+# that's actually drawn.
+# ASSUMPTION — confirm against the real annotation scheme:
+#   MCE/PEN/CZE  = micropylar / peripheral / chalazal endosperm -> Endosperm
+#   ii1/ii1'/ii2/oi1/oi2/CZSC/CPT = inner/outer integument, chalazal
+#     seed-coat & proliferating tissue -> Seed coat
+_SEED_3DAP_COMPARTMENT_TO_GROUP = {
+    "3DAP EMB": "3DAP_Embryo",
+    "3DAP FUN": "3DAP_Funiculus",
+    "3DAP OVL": "3DAP_Ovule",
+    "3DAP MCE": "3DAP_Endosperm",
+    "3DAP PEN": "3DAP_Endosperm",
+    "3DAP CZE": "3DAP_Endosperm",
+    "3DAP ii1": "3DAP_Seed_coat",
+    "3DAP ii1'": "3DAP_Seed_coat",
+    "3DAP ii2": "3DAP_Seed_coat",
+    "3DAP oi1": "3DAP_Seed_coat",
+    "3DAP oi2": "3DAP_Seed_coat",
+    "3DAP CZSC": "3DAP_Seed_coat",
+    "3DAP CPT": "3DAP_Seed_coat",
+}
+
+
+def _aggregate_seed_3dap_groups(expression_dict):
+    """Average the fine 3DAP compartment codes from the pseudobulk DB into
+    the coarse SVG group ids the 3DAP panel actually draws. The original
+    fine-grained keys are left in place (harmless — they just don't match
+    any SVG id), only the coarse group keys are added/overwritten."""
+    buckets = {}
+    for db_key, group_id in _SEED_3DAP_COMPARTMENT_TO_GROUP.items():
+        if db_key in expression_dict:
+            buckets.setdefault(group_id, []).append(expression_dict[db_key])
+    for group_id, vals in buckets.items():
+        expression_dict[group_id] = sum(vals) / len(vals)
+    return expression_dict
+
+
+# Reverse of _SEED_3DAP_COMPARTMENT_TO_GROUP: coarse SVG group id -> the fine
+# compartment codes it aggregates. Needed for the SVG-hover-highlights-UMAP
+# feature — the per-cell UMAP data keeps the fine codes (e.g. "3DAP MCE"),
+# so hovering a coarse 3DAP shape like "3DAP Endosperm" has to highlight
+# every one of its constituent codes' points, not the (nonexistent) coarse
+# label itself.
+_SEED_3DAP_GROUP_TO_COMPARTMENTS = {}
+for _db_key, _group_id in _SEED_3DAP_COMPARTMENT_TO_GROUP.items():
+    _SEED_3DAP_GROUP_TO_COMPARTMENTS.setdefault(_group_id, []).append(_db_key)
+del _db_key, _group_id
 
 _VASCULAR_CIRCLE_ID = {
     "D0": "D0_vascular_circle",
@@ -380,6 +455,30 @@ def seed_celltype_label(svg_id):
     return svg_id
 
 
+def _add_underscore_id_aliases(*expr_dicts):
+    """
+    SVG <g>/shape ids in these templates are now underscore-joined (spaces
+    were replaced with underscores directly in the SVG), but expression_dict
+    (and std_dict) keys come straight from the h5ad obs cell-type labels,
+    which may still contain literal spaces (e.g. "Guard Cell", "Phloem
+    Parenchyma"). Any code that looks a cell type up by matching
+    `el.get('id')` directly against these dicts would silently stop
+    matching for every label containing a space.
+
+    Add an alias entry (spaces -> underscores) for every such key in every
+    dict passed in, mapping to the same value, without touching or
+    overwriting any existing key. This keeps id-based lookups working
+    regardless of whether a given SVG template's ids use spaces or
+    underscores. Pass expression_dict and std_dict together so both stay
+    in sync.
+    """
+    for d in expr_dicts:
+        for k, v in list(d.items()):
+            if ' ' in k:
+                d.setdefault(k.replace(' ', '_'), v)
+    return expr_dicts[0] if len(expr_dicts) == 1 else expr_dicts
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Color utilities
 # ──────────────────────────────────────────────────────────────────────────────
@@ -449,6 +548,23 @@ def expression_to_color_relative(value, control_val, log2_max):
 # ──────────────────────────────────────────────────────────────────────────────
 # SVG legend + title
 # ──────────────────────────────────────────────────────────────────────────────
+
+def _format_tick_value(val, colour_ceiling, small_threshold=0.1):
+    """
+    Format one legend tick value.
+
+    When colour_ceiling (the scale's max) sits at the hundredths place or
+    smaller — e.g. 0.03 — two fixed decimals collapse most of the 10 tick
+    steps down to indistinguishable values like "0.01", "0.00", "0.00" and
+    the scale becomes unreadable. Switch to scientific notation in that
+    case; otherwise keep the normal two-decimal display.
+    """
+    if colour_ceiling and abs(colour_ceiling) < small_threshold:
+        if val == 0:
+            return "0"
+        return f"{val:.2e}"
+    return f"{val:.2f}"
+
 
 def add_legend(root, gene_name, colour_ceiling, n_boxes=10):
     SVG_NS = "http://www.w3.org/2000/svg"
@@ -542,10 +658,11 @@ def add_legend(root, gene_name, colour_ceiling, n_boxes=10):
 
         ratio_top = 1.0 - i / n_boxes
         tick_val = ratio_top * colour_ceiling
-        g.append(txt(x0 + box_w + tick_gap, by + 4, f"{tick_val:.2f}", fs=font_size - 1))
+        g.append(txt(x0 + box_w + tick_gap, by + 4,
+                      _format_tick_value(tick_val, colour_ceiling), fs=font_size - 1))
 
     g.append(txt(x0 + box_w + tick_gap, boxes_y0 + n_boxes * box_h + 4,
-                 f"0.00", fs=font_size - 1))
+                 _format_tick_value(0.0, colour_ceiling), fs=font_size - 1))
     root.append(g)
 
 
@@ -840,10 +957,10 @@ def add_gene_title(root, gene_name, font_size=18, padding_bottom=10):
 # SVG coloring
 # ──────────────────────────────────────────────────────────────────────────────
 
-def add_median_circle(root, gene_name, median_ctrl, radius=40):
+def add_mean_ctrl_circle(root, gene_name, median_ctrl, radius=40):
     """
-    Appends a reference circle to the SVG for the median-as-control relative view.
-    The circle is always yellow — it IS the control (log2 ratio = 0).
+    Appends a reference circle to the SVG for the Mean_CTRL-as-control relative
+    view. The circle is always yellow — it IS the control (log2 ratio = 0).
     Expands the canvas downward to make room so the circle never overlaps content.
     Placed centred horizontally in the new bottom strip.
     """
@@ -886,7 +1003,7 @@ def add_median_circle(root, gene_name, median_ctrl, radius=40):
     color = expression_to_color(0.0, 1.0, 'yellow_to_red', ratio=0.0)
 
     g = ET.Element(f'{{{SVG_NS}}}g')
-    g.set('id', 'median_summary_circle')
+    g.set('id', 'mean_ctrl_summary_circle')
 
     circle = ET.Element(f'{{{SVG_NS}}}circle')
     circle.set('cx', str(cx))
@@ -896,7 +1013,7 @@ def add_median_circle(root, gene_name, median_ctrl, radius=40):
     circle.set('stroke', '#555555')
     circle.set('stroke-width', '1.5')
     circle.set('data-tooltip',
-               f"Median control\nMedian of cell-type means: {median_ctrl:.4f}\n"
+               f"Mean control (CTRL)\nMean_CTRL from pseudobulk dump: {median_ctrl:.4f}\n"
                f"(log\u2082 ratio = 0 reference)")
     circle.set('class', 'hoverable')
     g.append(circle)
@@ -912,7 +1029,7 @@ def add_median_circle(root, gene_name, median_ctrl, radius=40):
         t.text = text
         return t
 
-    g.append(lbl("Median (control)", font_size + 4))
+    g.append(lbl("Mean CTRL (control)", font_size + 4))
     g.append(lbl(f"{median_ctrl:.4f}", (font_size + 4) * 2))
 
     root.append(g)
@@ -947,15 +1064,27 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                and el.tag == f'{{{SVG_NS}}}g'
         }
         vis_vals = [expression_dict[k] for k in svg_group_ids if k in expression_dict]
-    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_shoot_zhang', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
+
+        # ── Diagnostics: isolate exactly why a given timepoint fails to match ──
+        for _tp in ('3DAP', '5DAP', '7DAP'):
+            _tp_svg_ids = {sid for sid in svg_group_ids if sid.startswith(_tp)}
+            _tp_matched = {sid for sid in _tp_svg_ids if sid in expression_dict}
+            _tp_expr_keys = {k for k in expression_dict if k.startswith(_tp)}
+            print(
+                f"  Seed {_tp}: {len(_tp_matched)}/{len(_tp_svg_ids)} colorable SVG "
+                f"groups matched expression_dict. "
+                f"SVG ids (sample): {sorted(_tp_svg_ids)[:6]}  "
+                f"expression_dict keys (sample): {sorted(_tp_expr_keys)[:6]}",
+                file=sys.stderr)
+
+    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_shoot_zhang', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
         # Build vis_vals using exactly the same element-matching logic as the
         # Lee coloring loop: only elements whose id is in expression_dict,
         # restricted to shape tags (<path/circle/rect/ellipse/polygon>) or
         # <g> groups. This prevents structural SVG IDs (layer groups, defs,
         # etc.) from accidentally matching expression_dict keys and skewing
-        # the median. (at_rosette_21d_lee draws its cell-type shapes as
-        # <polygon>, unlike the path-based templates used by the other Lee
-        # datasets, hence 'polygon' being included here.)
+        # the median. polygon is included because the newer Lee rosette/
+        # seedling templates draw cell shapes as <polygon>, not <path>.
         _lee_shape_tags = {
             f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
             f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
@@ -968,7 +1097,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
         }
         vis_vals = [expression_dict[k] for k in _lee_vis_keys]
         if not vis_vals:
-            vis_vals = list(expression_dict.values())
+            vis_vals = [v for k, v in expression_dict.items() if k != "Mean_CTRL"]
         print(f"  Lee vis_vals: {len(vis_vals)} SVG-matched cell types: {sorted(_lee_vis_keys)}", file=sys.stderr)
         # For median_ctrl: exclude zero-expression cell types so the reference
         # is centred on the expressing population only, not dragged down by
@@ -981,7 +1110,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
         svg_ids = {el.get('id') for el in root.iter() if el.get('id')}
         vis_vals = [v for k, v in expression_dict.items() if k in svg_ids]
         if not vis_vals:
-            vis_vals = list(expression_dict.values())
+            vis_vals = [v for k, v in expression_dict.items() if k != "Mean_CTRL"]
 
     colour_ceiling = max(vis_vals) if vis_vals else 1.0
 
@@ -1054,21 +1183,35 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 pairs.append((v, ctrl))
         log2_max = _compute_log2_max(pairs)
 
-    # ── Median-as-control (seed / Lee datasets) ───────────────────────────────
-    # median_ctrl = median of vis_vals — the same SVG-visible per-cell-type means
-    # used for colour_ceiling. This excludes non-SVG keys (e.g. L1 annotation
-    # entries mixed into the seed expression_dict) so the reference is exactly
-    # the population being displayed.
+    # ── Mean_CTRL-as-control (seed / Lee datasets) ────────────────────────────
+    # Prefer the precomputed 'Mean_CTRL' row shipped in the pseudobulk SQL dump
+    # (already loaded into expression_dict by load_all_from_api, since that
+    # endpoint returns every data_bot_id row for the gene — Mean_CTRL included).
+    # Fall back to the median of SVG-visible cell-type means only when
+    # Mean_CTRL isn't present (e.g. direct-h5ad CGI mode, or at_shoot_zhang,
+    # which has no pseudobulk dump yet).
     median_ctrl = None
     if control == "median":
-        import statistics as _stats
-        _vis = [v for v in vis_vals if v is not None and v >= 0]
-        median_ctrl = float(_stats.median(_vis)) if _vis else 0.0
-        pairs = [(v, median_ctrl) for v in _vis]
-        log2_max = _compute_log2_max(pairs)
-        print(
-            f"  Median control (of {len(_vis)} SVG-visible cell-type means): {median_ctrl:.4f}  log2_max={log2_max:.4f}",
-            file=sys.stderr)
+        median_ctrl = expression_dict.get("Mean_CTRL")
+        if median_ctrl is not None:
+            median_ctrl = float(median_ctrl)
+            _vis = [v for v in vis_vals if v is not None and v >= 0]
+            pairs = [(v, median_ctrl) for v in _vis]
+            log2_max = _compute_log2_max(pairs)
+            print(
+                f"  Mean_CTRL control (from SQL dump): {median_ctrl:.4f}  log2_max={log2_max:.4f}",
+                file=sys.stderr)
+        else:
+            import statistics as _stats
+            _vis = [v for v in vis_vals if v is not None and v >= 0]
+            median_ctrl = float(_stats.median(_vis)) if _vis else 0.0
+            pairs = [(v, median_ctrl) for v in _vis]
+            log2_max = _compute_log2_max(pairs)
+            print(
+                f"  Mean_CTRL not found in expression_dict — falling back to "
+                f"median of {len(_vis)} SVG-visible cell-type means: {median_ctrl:.4f}  "
+                f"log2_max={log2_max:.4f}",
+                file=sys.stderr)
 
     def get_color(key):
         v = expression_dict.get(key)
@@ -1120,12 +1263,13 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
         no data-tooltip, and no data-celltype — i.e. no hover behavior at
         all, even though the color-selection logic upstream matched fine.
 
-        umap_ct_label carries the *condition-qualified* label (e.g.
-        "D0_Mesophyll") used by natanella's UMAP (umap_col =
-        label_majorXcondition combines condition + cell type). It's kept
-        separate from data-celltype/ct_label — which stays condition-agnostic
-        ("Mesophyll") so the existing SVG-side Highlight dropdown still
-        highlights that cell type across all four condition panels at once.
+        umap_ct_label is an optional override for the hover-to-UMAP label,
+        used when it needs to differ from data-celltype/ct_label — e.g. a
+        single drawn shape (like the combined Phloem circle) that should
+        highlight several UMAP clusters at once (pipe-separated). When not
+        given, hover falls back to data-celltype, which already matches
+        natanella's UMAP cluster names directly (they're plain cell-type
+        names with no condition prefix).
         """
         for tag in _NAT_SHAPE_TAGS:
             for p in el.iter(tag):
@@ -1156,8 +1300,10 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
         print(f"  Rice cts   in expr_dict: {sorted(_all_cts)}", file=sys.stderr)
 
         def _normalise(s):
-            """Lower-case, replace dots/hyphens with spaces, collapse whitespace."""
-            return ' '.join(s.lower().replace('.', ' ').replace('-', ' ').split())
+            """Lower-case, replace dots/hyphens/underscores with spaces, collapse whitespace."""
+            return ' '.join(
+                s.lower().replace('.', ' ').replace('-', ' ').replace('_', ' ').split()
+            )
 
         # Step 2: normalised-string → actual obs value lookup.
         _norm_to_cond = {_normalise(c): c for c in _all_conds}
@@ -1278,7 +1424,8 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 _canvas_w = float(re.sub(r'[^0-9.]', '', root.get('width', '') or '') or 1000)
                 _canvas_h = float(re.sub(r'[^0-9.]', '', root.get('height', '') or '') or 1000)
 
-            _m_re = re.compile(r'^\s*[Mm]\s*([-\d.eE]+)[,\s]+([-\d.eE]+)')
+            _NUM = r'[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?'
+            _m_re = re.compile(r'^\s*[Mm]\s*(' + _NUM + r')[,\s]*(' + _NUM + r')')
 
             def _first_point(d_str):
                 """Read the (x, y) of a path's first (absolute) moveto."""
@@ -1440,7 +1587,7 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                     continue
                 el = id_to_el.get(svg_id_fn(c))
                 if el is not None:
-                    color_paths_in_element(el, color, tip, ct, umap_ct_label=key)
+                    color_paths_in_element(el, color, tip, ct)
 
         # Phloem (averaged)
         cell_types_seen.add("Phloem (avg)")
@@ -1485,7 +1632,10 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 continue
             el = id_to_el.get(f"{c}_phloem")
             if el is not None:
-                color_paths_in_element(el, color, tip, "Phloem (avg)")
+                color_paths_in_element(
+                    el, color, tip, "Phloem (avg)",
+                    umap_ct_label="Phloem Parenchyma|Phloem companion",
+                )
 
     elif ds_key == 'at_root_rs':
         for el in root.iter():
@@ -1550,12 +1700,21 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
             ct_label = seed_celltype_label(el_id)
             cell_types_seen.add(ct_label)
 
+            # The coarse 3DAP shapes ("3DAP Endosperm", "3DAP Seed coat", ...)
+            # don't exist as per-cell UMAP labels — the UMAP keeps the fine
+            # compartment codes ("3DAP MCE", "3DAP CZE", ...) that were
+            # averaged together to color this shape. Tag with all of them
+            # (pipe-separated) so hovering highlights every contributing
+            # compartment's points instead of matching nothing.
+            _umap_compartments = _SEED_3DAP_GROUP_TO_COMPARTMENTS.get(el_id)
+            umap_ct_label = '|'.join(_umap_compartments) if _umap_compartments else None
+
             v = expression_dict[el_id]
             if control == 'median' and median_ctrl is not None:
                 color = expression_to_color_relative(v, median_ctrl, log2_max)
                 log2_r = v - median_ctrl
                 tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                       f"Median control: {median_ctrl:.4f}\n"
+                       f"Mean control (CTRL): {median_ctrl:.4f}\n"
                        f"Log fold-change: {log2_r:.4f}")
             else:
                 color = get_color(el_id)
@@ -1572,34 +1731,40 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                     set_fill(child, color, opacity)
                     add_tooltip(child, tip)
                     tag_celltype(child, ct_label)
+                    if umap_ct_label:
+                        child.set('data-umap-celltype', umap_ct_label)
 
-    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_shoot_zhang', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
-        _lee_paint_tags = (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
-                           f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
-                           f'{{{SVG_NS}}}polygon')
+    elif ds_key in ('at_flower_lee', 'at_silique_lee', 'at_stem_lee', 'at_shoot_zhang', 'at_seed_0d_lee', 'at_rosette_21d_lee', 'at_rosette_30d_lee', 'at_seedling_3d_lee', 'at_seedling_6d_lee', 'at_seedling_12d_lee'):
         for el in root.iter():
             el_id = el.get('id', '')
             if not el_id or el_id not in expression_dict:
                 continue
 
-            ct_label = el_id
+            # el_id is the underscore-joined SVG id; use a space-joined form
+            # for the human-readable highlight-dropdown label / tooltip.
+            # Both the dropdown option and the data-celltype attribute below
+            # derive from this same ct_label, so the highlight matching in
+            # applyHighlight() (which compares them verbatim) still works.
+            ct_label = el_id.replace('_', ' ')
             cell_types_seen.add(ct_label)
 
             v = expression_dict[el_id]
             if control == 'median' and median_ctrl is not None:
                 color = expression_to_color_relative(v, median_ctrl, log2_max)
                 log2_r = v - median_ctrl
-                tip = (f"{el_id}\nAvg expression: {v:.4f}\n"
-                       f"Median control: {median_ctrl:.4f}\n"
+                tip = (f"{ct_label}\nAvg expression: {v:.4f}\n"
+                       f"Mean control (CTRL): {median_ctrl:.4f}\n"
                        f"Log fold-change: {log2_r:.4f}")
             else:
                 color = get_color(el_id)
-                tip = f"{el_id}\nAvg expression: {raw_val(el_id)}"
+                tip = f"{ct_label}\nAvg expression: {raw_val(el_id)}"
 
             if not color:
                 continue
 
-            if el.tag in _lee_paint_tags:
+            if el.tag in (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
+                          f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
+                          f'{{{SVG_NS}}}polygon'):
                 set_fill(el, color, opacity)
                 add_tooltip(el, tip)
                 tag_celltype(el, ct_label)
@@ -1611,7 +1776,9 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
                 for child in el.iter():
                     if child is el:
                         continue
-                    if child.tag in _lee_paint_tags:
+                    if child.tag in (f'{{{SVG_NS}}}path', f'{{{SVG_NS}}}circle',
+                                     f'{{{SVG_NS}}}rect', f'{{{SVG_NS}}}ellipse',
+                                     f'{{{SVG_NS}}}polygon'):
                         set_fill(child, color, opacity)
                         add_tooltip(child, tip)
                         tag_celltype(child, ct_label)
@@ -1629,12 +1796,13 @@ def color_svg(svg_file, expression_dict, ds_key, gene_name=None, opacity=1.0, co
         add_relative_legend_labeled(root, gene_name or "Expression", log2_max,
                                     control_label=_CONTROL_LABELS[control])
     elif control == 'median':
-        # Seed / Lee: diverging scale centred on median of cell-type means.
-        # No reference circle here — 'median' isn't a real experimental
-        # control (unlike W0/WW/Col-0), so there's nothing to anchor a
-        # circle to.
+        # Seed / Lee: diverging scale centred on Mean_CTRL from the pseudobulk
+        # SQL dump (falls back to median of cell-type means if unavailable).
+        # No reference circle here — matches the bardev version, which
+        # dropped it since these datasets have no real experimental control
+        # to anchor a circle to.
         add_relative_legend_labeled(root, gene_name or "Expression", log2_max,
-                                    control_label="Median")
+                                    control_label="Mean CTRL")
     else:
         add_legend(root, gene_name or "Expression", colour_ceiling)
 
@@ -1716,6 +1884,11 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
             for ct in pd.unique(cell_types_l2)
             if (cell_types_l2 == ct).sum() > 0
         }
+        std_dict = {
+            str(ct): float(np.std(X_col[cell_types_l2 == ct]))
+            for ct in pd.unique(cell_types_l2)
+            if (cell_types_l2 == ct).sum() > 0
+        }
 
         if cell_type_column_2 in adata.obs.columns:
             cell_types_l1 = adata.obs[cell_type_column_2].astype(str).to_numpy()
@@ -1723,7 +1896,9 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
                 mask = cell_types_l1 == ct
                 if mask.sum() > 0:
                     expression_dict[str(ct)] = float(np.mean(X_col[mask]))
+                    std_dict[str(ct)] = float(np.std(X_col[mask]))
 
+        _add_underscore_id_aliases(expression_dict, std_dict)
         print(f"  Gene: {display_name}  ({len(expression_dict)} groups, L1+L2)", file=sys.stderr)
 
     elif cell_type_column_2 == 'Condition':
@@ -1745,6 +1920,12 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
             for cond in pd.unique(condition)
             if ((cell_types == ct) & (condition == cond)).sum() > 0
         }
+        std_dict = {
+            f"{cond}_{ct}": float(np.std(X_col[(cell_types == ct) & (condition == cond)]))
+            for ct in pd.unique(cell_types)
+            for cond in pd.unique(condition)
+            if ((cell_types == ct) & (condition == cond)).sum() > 0
+        }
         print(f"  Gene: {display_name}  ({len(expression_dict)} groups, CAxCondition)", file=sys.stderr)
         print(f"  Sample keys: {list(expression_dict.keys())[:6]}", file=sys.stderr)
 
@@ -1757,6 +1938,7 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
         X_col = X_col.astype(float)
 
         expression_dict = {}
+        std_dict = {}
 
         h5ad_to_id = {
             'Col-0 (shr2)_Root endodermis': ['shr2_top_endodermis', 'shr2_side_endodermis', 'shr2_tip_endodermis'],
@@ -1793,28 +1975,47 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
 
         cell_types = adata.obs[cell_type_column_1].astype(str).to_numpy()
         genotype = adata.obs[cell_type_column_2].astype(str).to_numpy()
-        intermediate_dict = {
+        intermediate_avg = {
             f"{geno}_{ct}": float(np.mean(X_col[(cell_types == ct) & (genotype == geno)]))
             for ct in pd.unique(cell_types)
             for geno in pd.unique(genotype)
             if ((cell_types == ct) & (genotype == geno)).sum() > 0 and f"{geno}_{ct}" in h5ad_to_id.keys()
         }
+        intermediate_std = {
+            f"{geno}_{ct}": float(np.std(X_col[(cell_types == ct) & (genotype == geno)]))
+            for ct in pd.unique(cell_types)
+            for geno in pd.unique(genotype)
+            if ((cell_types == ct) & (genotype == geno)).sum() > 0 and f"{geno}_{ct}" in h5ad_to_id.keys()
+        }
 
-        for key in intermediate_dict.keys():
+        for key in intermediate_avg.keys():
             for pov in h5ad_to_id[key]:
-                expression_dict[pov] = intermediate_dict[key]
+                expression_dict[pov] = intermediate_avg[key]
+                std_dict[pov] = intermediate_std[key]
 
+        # Synthetic xylem/phloem std: std of the mean of two independent
+        # groups (equal-weight) = sqrt((std_a^2 + std_b^2) / 4) — the same
+        # formula generate_pseudobulk_dumps.py's post_process_root() uses,
+        # so the CGI/CLI path and the pseudobulk-dump path agree here too.
         for prefix in ('shr2', 'scr4', 'col0'):
             if f'{prefix}_proto_circle' not in expression_dict or f'{prefix}_meta_circle' not in expression_dict:
                 continue
             expression_dict[f'{prefix}_top_xylem'] = (
                     (expression_dict[f'{prefix}_proto_circle'] + expression_dict[f'{prefix}_meta_circle']) / 2
             )
+            std_dict[f'{prefix}_top_xylem'] = (
+                (std_dict[f'{prefix}_proto_circle'] ** 2 + std_dict[f'{prefix}_meta_circle'] ** 2) / 4
+            ) ** 0.5
             expression_dict[f'{prefix}_side_xylem'] = expression_dict[f'{prefix}_top_xylem']
+            std_dict[f'{prefix}_side_xylem'] = std_dict[f'{prefix}_top_xylem']
             expression_dict[f'{prefix}_top_phloem'] = (
                     (expression_dict[f'{prefix}_xpp_circle'] + expression_dict[f'{prefix}_ppp_circle']) / 2
             )
+            std_dict[f'{prefix}_top_phloem'] = (
+                (std_dict[f'{prefix}_xpp_circle'] ** 2 + std_dict[f'{prefix}_ppp_circle'] ** 2) / 4
+            ) ** 0.5
             expression_dict[f'{prefix}_side_phloem'] = expression_dict[f'{prefix}_top_phloem']
+            std_dict[f'{prefix}_side_phloem'] = std_dict[f'{prefix}_top_phloem']
 
     else:
         X_col = adata.X[:, gene_idx]
@@ -1832,6 +2033,12 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
             for ct in unique_cell_types
             if (cell_types == ct).sum() > 0
         }
+        std_dict = {
+            str(ct): float(np.std(X_col[cell_types == ct]))
+            for ct in unique_cell_types
+            if (cell_types == ct).sum() > 0
+        }
+        _add_underscore_id_aliases(expression_dict, std_dict)
 
     print(f"  Gene: {display_name}  ({len(expression_dict)} cell-type groups)", file=sys.stderr)
 
@@ -1861,14 +2068,226 @@ def load_all(h5ad_path, gene_list, cell_type_column_1, cell_type_column_2=None, 
         print("  Warning: X_umap not found — UMAP panel will be skipped", file=sys.stderr)
 
     print(f"  Final UMAP dataframe size: {len(umap_data) if umap_data is not None else 0:,}", file=sys.stderr)
-    return expression_dict, display_name, umap_data
+    return expression_dict, display_name, umap_data, std_dict
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# API-based loader — replaces load_all() when running locally against BAR_API
+# ──────────────────────────────────────────────────────────────────────────────
+
+def load_all_from_api(ds_key, gene_id):
+    """
+    Fetch expression and UMAP data from BAR_API on localhost instead of
+    reading h5ad files.  Returns an (expression_dict, gene_name, umap_df,
+    std_dict) quadruple — std_dict adds a std_dict (see below) on top of
+    the (expression_dict, gene_name, umap_df) triple load_all() returns.
+
+    Expression endpoint:
+        GET /gene_expression/expression/{expr_db}/{gene_id}
+        Returns rows with data_bot_id (cell-type key), data_signal (mean),
+        and — when present — a standard-deviation field (data_signal_std,
+        std, stdev, or std_dev; BAR API implementations vary). std_dict is
+        keyed identically to expression_dict, one entry per data_bot_id
+        that had a recognizable std field; cell types with no std field in
+        the API response simply have no entry (checked with .get(), not KeyError).
+
+    UMAP endpoint:
+        GET /gene_expression/umap/{umap_db}/{gene_id}
+        Returns per-cell records with umap_1, umap_2, expression, cell_type.
+
+    expression_dict (and therefore std_dict) is the SAME pseudobulk source
+    the SVG hover tooltips are built from (see color_svg's raw_val()) — so
+    a UMAP cell-type row's mean/std and its SVG hover's "Avg expression"
+    are guaranteed to agree; there is no separate computation from the
+    per-cell UMAP sample.
+    """
+    import requests
+    import pandas as pd
+    import numpy as np
+
+    db_map = API_DATABASE_MAP.get(ds_key)
+    if db_map is None:
+        raise ValueError(f"Dataset '{ds_key}' has no API database mapping.")
+
+    expr_db, umap_db = db_map
+
+    # ── Expression (pseudobulk) ──────────────────────────────────────────
+    expression_dict = {}
+    std_dict = {}
+    gene_name = gene_id  # fallback display name
+
+    if expr_db is None:
+        raise ValueError(
+            f"No pseudobulk database configured for '{ds_key}'. "
+            f"Load the SQL dump first or add the mapping to API_DATABASE_MAP."
+        )
+
+    expr_url = f"{BAR_API_BASE}/gene_expression/expression/{expr_db}/{gene_id}"
+    print(f"  Fetching expression: {expr_url}", file=sys.stderr)
+    resp = requests.get(expr_url, timeout=30)
+
+    if resp.status_code != 200:
+        body = resp.json() if resp.headers.get('content-type', '').startswith('application/json') else {}
+        err_msg = body.get('error', resp.text[:200])
+        raise ValueError(
+            f"Expression API returned {resp.status_code} for {gene_id} "
+            f"in {expr_db}: {err_msg}"
+        )
+
+    payload = resp.json()
+
+    # Handle BAR API response formats:
+    #   Legacy: { "wasSuccessful": true, "data": { "data": [ {"name","value"}, ... ] } }
+    #   Current: { "wasSuccessful": true, "data": { "expression": [ {"name","value"}, ... ],
+    #                                                "mean_expression": {"name":"Mean_CTRL","value":...} } }
+    mean_row = None
+    if isinstance(payload, dict):
+        inner = payload.get("data", payload)
+        if isinstance(inner, dict):
+            if "expression" in inner:
+                rows = inner.get("expression", [])
+                mean_row = inner.get("mean_expression")
+            else:
+                rows = inner.get("data", [])
+        elif isinstance(inner, list):
+            rows = inner
+        else:
+            rows = []
+    elif isinstance(payload, list):
+        rows = payload
+    else:
+        rows = []
+
+    if not rows:
+        raise ValueError(
+            f"No expression data returned for {gene_id} in {expr_db}. "
+            f"Is the gene ID correct and the SQL dump loaded?"
+        )
+
+    # Field name for std varies across BAR API deployments — try the known
+    # candidates in order and use whichever is present on the row.
+    _STD_FIELD_CANDIDATES = ("data_signal_std", "std", "stdev", "std_dev")
+
+    def _extract_std(row):
+        for field in _STD_FIELD_CANDIDATES:
+            if row.get(field) is not None:
+                try:
+                    return float(row[field])
+                except (TypeError, ValueError):
+                    return None
+        return None
+
+    for row in rows:
+        if isinstance(row, dict):
+            # BAR API uses "name" / "value" (value as string)
+            bot_id = row.get("name") or row.get("data_bot_id", "")
+            signal = row.get("value") or row.get("data_signal", 0.0)
+            if bot_id:
+                expression_dict[str(bot_id)] = float(signal)
+                std_val = _extract_std(row)
+                if std_val is not None:
+                    std_dict[str(bot_id)] = std_val
+
+    if isinstance(mean_row, dict):
+        bot_id = mean_row.get("name") or mean_row.get("data_bot_id", "Mean_CTRL")
+        signal = mean_row.get("value") or mean_row.get("data_signal")
+        if signal is not None:
+            expression_dict[str(bot_id)] = float(signal)
+            std_val = _extract_std(mean_row)
+            if std_val is not None:
+                std_dict[str(bot_id)] = std_val
+
+    if ds_key == 'at_seed_martin':
+        _aggregate_seed_3dap_groups(expression_dict)
+
+    # Alias every space-containing data_bot_id with an underscore-joined
+    # version too (e.g. "Shoot apical meristem" -> also usable as
+    # "Shoot_apical_meristem"). SVG group ids across these single-column
+    # datasets are underscore-joined, but the pseudobulk dump's data_bot_id
+    # is the raw obs cell-type string verbatim (spaces intact) — this was
+    # previously only applied for at_seed_martin, so any other dataset with
+    # a multi-word cell-type name (e.g. Zhang's "Shoot apical meristem",
+    # or Lee flower's "Developing ovule") never matched its SVG id at all.
+    # Safe to apply unconditionally: setdefault only adds new alias keys,
+    # never touches or overwrites an existing one.
+    _add_underscore_id_aliases(expression_dict, std_dict)
+
+    print(f"  Expression: {len(expression_dict)} cell-type groups from API",
+          file=sys.stderr)
+    if std_dict:
+        print(f"  Std: {len(std_dict)} cell-type groups had a std field",
+              file=sys.stderr)
+    else:
+        print(
+            "  Std: no std field found on any row — check "
+            f"_STD_FIELD_CANDIDATES {_STD_FIELD_CANDIDATES} against the "
+            "actual BAR API response for this endpoint",
+            file=sys.stderr,
+        )
+
+    # ── UMAP ─────────────────────────────────────────────────────────────
+    umap_data = None
+
+    if umap_db is not None:
+        umap_url = f"{BAR_API_BASE}/umap_expression/{umap_db}/{gene_id}"
+        print(f"  Fetching UMAP: {umap_url}", file=sys.stderr)
+
+        try:
+            uresp = requests.get(umap_url, timeout=60)
+            if uresp.status_code == 200:
+                upayload = uresp.json()
+                # BAR API nests: { "data": { "data": [ {umap_1, umap_2, expression, cell_type}, ... ] } }
+                urows = []
+                if isinstance(upayload, dict):
+                    inner = upayload.get("data", upayload)
+                    if isinstance(inner, dict):
+                        urows = inner.get("data", [])
+                    elif isinstance(inner, list):
+                        urows = inner
+                elif isinstance(upayload, list):
+                    urows = upayload
+
+                if urows:
+                    umap_data = pd.DataFrame({
+                        'UMAP_1':          [float(r['umap_1']) for r in urows],
+                        'UMAP_2':          [float(r['umap_2']) for r in urows],
+                        'cell_type':       [str(r['cell_type']) for r in urows],
+                        'gene_expression': [float(r['expression']) for r in urows],
+                    })
+                    umap_data = umap_data.replace(
+                        [np.inf, -np.inf], np.nan
+                    ).dropna(subset=['UMAP_1', 'UMAP_2', 'gene_expression'])
+                    print(f"  UMAP rows loaded: {len(umap_data):,}",
+                          file=sys.stderr)
+                else:
+                    print("  UMAP endpoint returned no rows", file=sys.stderr)
+            else:
+                print(f"  UMAP API returned {uresp.status_code} — skipping",
+                      file=sys.stderr)
+        except Exception as e:
+            print(f"  UMAP fetch failed ({e}) — skipping", file=sys.stderr)
+    else:
+        print(f"  No UMAP database configured for '{ds_key}' — skipping",
+              file=sys.stderr)
+
+    return expression_dict, gene_name, umap_data, std_dict
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # UMAP Plotly figure → HTML div string
 # ──────────────────────────────────────────────────────────────────────────────
 
-def build_umap_div(umap_df, gene_name):
+def build_umap_div(umap_df, gene_name, expression_dict=None, std_dict=None):
+    """
+    expression_dict / std_dict, when supplied, are the SAME pseudobulk
+    dicts color_svg() uses for SVG hover tooltips (see load_all_from_api's
+    docstring) — looked up here by the UMAP row's cell_type string, which
+    is expected to already match the pseudobulk data_bot_id naming
+    convention. Passing them in means each dropdown row (other than
+    "All Cells") shows a mean/std pulled directly from the pseudobulk
+    dump rather than recomputed from the UMAP's own (sampled) per-cell
+    points, so the two numbers can never disagree.
+    """
     import plotly.graph_objects as go
     import numpy as np
 
@@ -1882,6 +2301,27 @@ def build_umap_div(umap_df, gene_name):
 
     cell_types = sorted(umap_df['cell_type'].astype(str).unique())
 
+    # ── Pseudobulk mean/std for each dropdown row (never for "All Cells") ──
+    def _stats_label(ct):
+        mean = expression_dict.get(ct) if expression_dict else None
+        std = std_dict.get(ct) if std_dict else None
+        if mean is None:
+            return ct
+        if std is not None:
+            return f"{ct}  (\u03bc={mean:.4f}, \u03c3={std:.4f})"
+        return f"{ct}  (\u03bc={mean:.4f})"
+
+    if expression_dict:
+        n_matched = sum(1 for ct in cell_types if ct in expression_dict)
+        print(
+            f"  UMAP dropdown stats: {n_matched}/{len(cell_types)} cell "
+            f"types matched a pseudobulk data_bot_id",
+            file=sys.stderr,
+        )
+        if n_matched < len(cell_types):
+            unmatched = [ct for ct in cell_types if ct not in expression_dict][:5]
+            print(f"    unmatched (sample): {unmatched}", file=sys.stderr)
+
     fig = go.Figure()
 
     fig.add_trace(go.Scattergl(
@@ -1894,7 +2334,7 @@ def build_umap_div(umap_df, gene_name):
             showscale=True,
             colorbar=dict(title=f"{gene_name}<br>Expression"),
             opacity=0.6,
-            line=dict(width=0.5, color='rgba(0,0,0,0.35)')
+            line = dict(width=0.5, color='rgba(0,0,0,0.35)')
         ),
         # selected/unselected styling lets JS spotlight one cell type via
         # selectedpoints without needing a separate trace per cell type.
@@ -1957,7 +2397,7 @@ def build_umap_div(umap_df, gene_name):
         visible[i + 1] = True
 
         buttons.append({
-            "label": ct,
+            "label": _stats_label(ct),
             "method": "update",
             "args": [
                 {"visible": visible},
@@ -1985,11 +2425,11 @@ def build_umap_div(umap_df, gene_name):
         xaxis=dict(title="UMAP_1", range=[x_min, x_max]),
         yaxis=dict(title="UMAP_2", range=[y_min, y_max]),
         template="plotly_white",
+        plot_bgcolor="#f2f2f2",
+        paper_bgcolor="#ffffff",
         showlegend=False,
         height=650,
-        margin=dict(t=60, b=40, l=40, r=40),
-        plot_bgcolor = "#f2f2f2",
-        paper_bgcolor = "#ffffff",
+        margin=dict(t=60, b=40, l=40, r=40)
     )
 
     return fig.to_html(full_html=False, include_plotlyjs='cdn', div_id='umap-plot')
@@ -2273,11 +2713,14 @@ TOOLTIP_JS = """
   }, true);
 
   function attachHoverableListeners() {
-    // Listen only on <path>/<circle> that were actually coloured (tagged
-    // 'hoverable' by add_tooltip during SVG colouring) — this excludes
-    // purely structural elements like the "outlines" and "label" groups,
-    // which are never in expression_dict and so never get tooltipped.
-    document.querySelectorAll('#svg-string path.hoverable, #svg-string circle.hoverable, #svg-string polygon.hoverable').forEach(function(el) {
+    // Listen on every <path> and <circle> inside the SVG container
+    // Only shapes color_svg actually colored get the 'hoverable' class
+    // (added by add_tooltip). Some SVGs — natanella's included — render
+    // legend captions as <path> text outlines too; without this scoping
+    // those decorative paths would also get mouseenter/mouseleave
+    // listeners, bolding every sibling caption's stroke and firing a
+    // spurious scheduleUmapHighlight(null) on hover.
+    document.querySelectorAll('#svg-string path.hoverable, #svg-string circle.hoverable').forEach(function(el) {
       if (el.dataset.hoverBound) return;
       el.dataset.hoverBound = '1';
 
@@ -2287,7 +2730,7 @@ TOOLTIP_JS = """
         if (!group || group.tagName.toLowerCase() !== 'g') return;
 
         // Highlight all direct child paths/circles in this <g>
-        group.querySelectorAll(':scope > path, :scope > circle, :scope > polygon').forEach(function(sib) {
+        group.querySelectorAll(':scope > path, :scope > circle').forEach(function(sib) {
           if (!sib.dataset.origStroke) {
             sib.dataset.origStroke = sib.getAttribute('stroke-width') || '1';
             sib.dataset.origStrokeColor = sib.getAttribute('stroke') || '';
@@ -2300,10 +2743,13 @@ TOOLTIP_JS = """
         // Mirror the hover onto the UMAP below (debounced — see
         // scheduleUmapHighlight — so fast mouse movement across many
         // SVG shapes doesn't fire a Plotly restyle per pixel).
-        // data-umap-celltype (condition-qualified, e.g. "D0_Mesophyll")
-        // takes priority over the plain data-celltype: natanella's UMAP
-        // clusters are labeled condition+celltype together, so the bare
-        // cell-type name alone ("Mesophyll") would never match a cluster.
+        // data-umap-celltype takes priority over the plain data-celltype
+        // when set: natanella's UMAP clusters are labeled condition+celltype
+        // together (e.g. "D0_Mesophyll"), and the seed dataset's coarse
+        // 3DAP shapes ("3DAP Endosperm") don't exist as UMAP labels at all —
+        // only their pipe-separated fine compartment codes do (e.g.
+        // "3DAP MCE|3DAP PEN|3DAP CZE") — so in both cases the bare
+        // cell-type name alone would never match a cluster.
         scheduleUmapHighlight(el.getAttribute('data-umap-celltype') || el.getAttribute('data-celltype'));
       });
 
@@ -2357,7 +2803,15 @@ TOOLTIP_JS = """
         Plotly.restyle(gd, { selectedpoints: [null] }, [0]);
         return;
       }
-      const points = __umapCellIndex[cellType] || [];
+      // cellType may be a single label or several pipe-separated fine
+      // compartment codes (the seed dataset's coarse 3DAP shapes) —
+      // gather every matching point across all of them.
+      const keys = cellType.split('|');
+      let points = [];
+      keys.forEach(function(k) {
+        const idx = __umapCellIndex[k];
+        if (idx) points = points.concat(idx);
+      });
       Plotly.restyle(gd, { selectedpoints: [points] }, [0]);
     }, UMAP_HOVER_DEBOUNCE_MS);
   }
@@ -2932,26 +3386,6 @@ def build_html(svg_string, umap_div, gene_name, active_ds_key, active_col,
             }}
           }}
         }});
-
-        // Also fade purely structural top-level groups (e.g. "outlines",
-        // "label") into the background whenever a highlight is active.
-        // These never carry data-celltype themselves (they aren't coloured
-        // cell-type data), so they're identified generically as: a direct
-        // child of the SVG root, with an id, that contains no
-        // data-celltype-tagged element anywhere inside it. This leaves the
-        // "samples" wrapper (and flat cell-type groups on datasets with no
-        // such wrapper) alone, since those DO contain data-celltype elements
-        // and are already handled per cell-type above.
-        var svgRoot = document.querySelector('#svg-string > svg');
-        if (svgRoot) {{
-          Array.from(svgRoot.children).forEach(function(el) {{
-            if (!el.id) return;
-            el.classList.remove('celltype-dim');
-            if (ct && !el.querySelector('[data-celltype]')) {{
-              el.classList.add('celltype-dim');
-            }}
-          }});
-        }}
       }}
 
       const openBtn = document.getElementById('openPopupBtn');
@@ -2981,6 +3415,115 @@ def build_html(svg_string, umap_div, gene_name, active_ds_key, active_col,
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Shared rendering pipeline — used by all three modes (CGI, CLI, Flask/local)
+# ──────────────────────────────────────────────────────────────────────────────
+
+_RELATIVE_CONTROL = {
+    'arabidopsis_nat': 'W0',
+    'rice': 'WW',
+    'at_root_rs': 'Col-0',
+    'at_seed_martin': 'median',
+    'at_flower_lee': 'median',
+    'at_silique_lee': 'median',
+    'at_stem_lee': 'median',
+    'at_shoot_zhang': 'median',
+    'at_seed_0d_lee': 'median',
+    'at_rosette_21d_lee': 'median',
+    'at_rosette_30d_lee': 'median',
+    'at_seedling_3d_lee': 'median',
+    'at_seedling_6d_lee': 'median',
+    'at_seedling_12d_lee': 'median',
+}
+
+
+def render_page(ds_key, col_key, expression_dict, gene_name, umap_df,
+                svg_template, opacity, std_dict=None):
+    """Given loaded data, produce the full HTML page string.
+
+    std_dict is passed through to build_umap_div() along with
+    expression_dict so the UMAP dropdown's mean/std matches the SVG hover
+    values exactly, whether the data came from load_all_from_api() (the
+    pseudobulk MySQL dump, via BAR API) or load_all() (a direct h5ad read
+    in CGI/CLI mode) — both now compute std the same way.
+    """
+    relative_svg_string = None
+
+    # ── Absolute SVG ─────────────────────────────────────────────────────
+    ET.register_namespace('', 'http://www.w3.org/2000/svg')
+    svg_tree, cell_types = color_svg(
+        svg_template, expression_dict, ds_key,
+        gene_name=gene_name, opacity=opacity,
+    )
+    buf = io.BytesIO()
+    svg_tree.write(buf, encoding='utf-8', xml_declaration=False)
+    svg_string = buf.getvalue().decode('utf-8')
+
+    # ── Relative SVG ─────────────────────────────────────────────────────
+    rel_control = _RELATIVE_CONTROL.get(ds_key)
+    if rel_control:
+        ET.register_namespace('', 'http://www.w3.org/2000/svg')
+        svg_tree_rel, _ = color_svg(
+            svg_template, expression_dict, ds_key,
+            gene_name, opacity, control=rel_control,
+        )
+        buf_rel = io.BytesIO()
+        svg_tree_rel.write(buf_rel, encoding='utf-8', xml_declaration=False)
+        relative_svg_string = buf_rel.getvalue().decode('utf-8')
+
+    umap_div = build_umap_div(
+        umap_df, gene_name, expression_dict=expression_dict, std_dict=std_dict
+    ) if umap_df is not None else None
+    violin_div = build_violin_div(
+        umap_df, gene_name, cell_types_order=cell_types
+    ) if umap_df is not None else None
+
+    return build_html(
+        svg_string, umap_div, gene_name,
+        active_ds_key=ds_key, active_col=col_key,
+        relative_svg_string=relative_svg_string,
+        cell_types=cell_types, violin_div=violin_div,
+    )
+
+
+def _load_h5ad_dispatch(ds_key, col_key, cfg, gene_list):
+    """Dispatch to load_all() with the right column arguments per dataset."""
+    h5ad_path = cfg["h5ad"]
+    umap_col = cfg["umap_col"]
+
+    if ds_key == 'rice' and col_key == 'CAxCondition':
+        return load_all(h5ad_path, gene_list, 'CellAnnotation', 'Condition', umap_col)
+    elif ds_key == 'at_root_rs' and col_key == 'TypexGenotype':
+        return load_all(h5ad_path, gene_list, 'Celltype', 'Genotype', umap_col)
+    elif ds_key == 'at_seed_martin':
+        if col_key == 'level_3_annotation_full_timed':
+            return load_all(h5ad_path, gene_list, 'level_3_annotation_full_timed', None, umap_col)
+        else:
+            return load_all(h5ad_path, gene_list, 'level_2_annotation_timed', 'level_1_annotation_timed', umap_col)
+    elif ds_key == 'at_flower_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_silique_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_stem_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_shoot_zhang':
+        return load_all(h5ad_path, gene_list, 'celltype_after', None, umap_col)
+    elif ds_key == 'at_seed_0d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_rosette_21d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_rosette_30d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_seedling_3d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_seedling_6d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    elif ds_key == 'at_seedling_12d_lee':
+        return load_all(h5ad_path, gene_list, 'CellType', None, umap_col)
+    else:
+        return load_all(h5ad_path, gene_list, col_key, None, umap_col)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Main
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -2988,6 +3531,7 @@ def main():
     is_cgi = "REQUEST_METHOD" in os.environ
 
     if is_cgi:
+        # ── CGI mode (bardev) — unchanged ────────────────────────────────
         sys.stdout.write("Content-Type: text/html\r\n\r\n")
         sys.stdout.flush()
 
@@ -3008,9 +3552,7 @@ def main():
         cfg = DATASETS[ds_key]
         h5ad_path = cfg["h5ad"]
         svg_template = cfg["svg"]
-        umap_col = cfg["umap_col"]
         opacity = cfg["opacity"]
-        relative_svg_string = None
 
         def html_error(msg):
             sys.stdout.write(
@@ -3026,126 +3568,16 @@ def main():
                 html_error(f"SVG template not found: {svg_template}")
                 return
 
-            if ds_key == 'rice' and col_key == 'CAxCondition':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellAnnotation', 'Condition', umap_col
-                )
-            elif ds_key == 'at_root_rs' and col_key == 'TypexGenotype':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'Celltype', 'Genotype', umap_col
-                )
-            elif ds_key == 'at_seed_martin':
-                if col_key == 'level_3_annotation_full_timed':
-                    svg_template = cfg.get("svg_l3", svg_template)
-                    expression_dict, gene_name, umap_df = load_all(
-                        h5ad_path, gene_list,
-                        'level_3_annotation_full_timed', None,
-                        umap_col
-                    )
-                else:
-                    expression_dict, gene_name, umap_df = load_all(
-                        h5ad_path, gene_list,
-                        'level_2_annotation_timed', 'level_1_annotation_timed',
-                        umap_col
-                    )
-            elif ds_key == 'at_flower_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_silique_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_stem_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_seed_0d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_rosette_21d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_shoot_zhang':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'celltype_after', None, umap_col
-                )
-            elif ds_key == 'at_rosette_30d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_seedling_3d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_seedling_6d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            elif ds_key == 'at_seedling_12d_lee':
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, 'CellType', None, umap_col
-                )
-            else:
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, gene_list, col_key, None, umap_col
-                )
+            if ds_key == 'at_seed_martin' and col_key == 'level_3_annotation_full_timed':
+                svg_template = cfg.get("svg_l3", svg_template)
 
-            # ── Absolute SVG ─────────────────────────────────────────────────
-            ET.register_namespace('', 'http://www.w3.org/2000/svg')
-            svg_tree, cell_types = color_svg(
-                svg_template,
-                expression_dict,
-                ds_key,
-                gene_name=gene_name,
-                opacity=opacity
+            expression_dict, gene_name, umap_df, std_dict = _load_h5ad_dispatch(
+                ds_key, col_key, cfg, gene_list
             )
-            buf = io.BytesIO()
-            svg_tree.write(buf, encoding='utf-8', xml_declaration=False)
-            svg_string = buf.getvalue().decode('utf-8')
-
-            # ── Relative SVG ─────────────────────────────────────────────────
-            _RELATIVE_CONTROL = {
-                'arabidopsis_nat': 'W0',
-                'rice': 'WW',
-                'at_root_rs': 'Col-0',
-                'at_seed_martin': 'median',
-                'at_flower_lee': 'median',
-                'at_silique_lee': 'median',
-                'at_stem_lee': 'median',
-                'at_seed_0d_lee': 'median',
-                'at_rosette_21d_lee': 'median',
-                'at_shoot_zhang': 'median',
-                'at_rosette_30d_lee': 'median',
-                'at_seedling_3d_lee': 'median',
-                'at_seedling_6d_lee': 'median',
-                'at_seedling_12d_lee': 'median',
-            }
-            rel_control = _RELATIVE_CONTROL.get(ds_key)
-            if rel_control:
-                ET.register_namespace('', 'http://www.w3.org/2000/svg')
-                svg_tree_rel, _ = color_svg(
-                    svg_template,
-                    expression_dict,
-                    ds_key,
-                    gene_name,
-                    opacity,
-                    control=rel_control,
-                )
-                buf_rel = io.BytesIO()
-                svg_tree_rel.write(buf_rel, encoding='utf-8', xml_declaration=False)
-                relative_svg_string = buf_rel.getvalue().decode('utf-8')
-
-            umap_div = build_umap_div(umap_df, gene_name) if umap_df is not None else None
-            violin_div = build_violin_div(umap_df, gene_name,
-                                          cell_types_order=cell_types) if umap_df is not None else None
-            html = build_html(svg_string, umap_div, gene_name,
-                              active_ds_key=ds_key, active_col=col_key,
-                              relative_svg_string=relative_svg_string,
-                              cell_types=cell_types,
-                              violin_div=violin_div)
+            html = render_page(
+                ds_key, col_key, expression_dict, gene_name, umap_df,
+                svg_template, opacity, std_dict=std_dict,
+            )
 
             sys.stdout.write(html)
             sys.stdout.flush()
@@ -3160,159 +3592,132 @@ def main():
 
         parser = argparse.ArgumentParser(description="eFP SVG + UMAP HTML viewer")
         parser.add_argument(
-            "ds_key", choices=list(DATASETS.keys()),
-            help="Dataset key: " + ", ".join(DATASETS.keys())
+            "--local", action="store_true",
+            help="Start a local web server that fetches from BAR_API on Docker"
         )
-        parser.add_argument("gene", nargs='+', help="Gene ID(s); first valid one is used")
-        parser.add_argument("output", nargs='?', default="efp_viewer.html")
+        parser.add_argument(
+            "--port", type=int, default=8080,
+            help="Port for local server (default: 8080)"
+        )
+        parser.add_argument(
+            "--api-base", type=str, default=None,
+            help="Override BAR_API base URL (default: http://localhost:5000)"
+        )
+        # CLI-only args (ignored in --local mode)
+        parser.add_argument(
+            "ds_key", nargs='?', choices=list(DATASETS.keys()),
+            help="Dataset key (CLI mode only)"
+        )
+        parser.add_argument("gene", nargs='*', help="Gene ID(s) (CLI mode only)")
+        parser.add_argument("--output", default="efp_viewer.html")
         parser.add_argument(
             "--col",
             choices=list(COLUMNS.keys()),
             default=DEFAULT_COLUMN,
-            help="obs column to colour by (default: %(default)s)"
         )
         args = parser.parse_args()
 
-        cfg = DATASETS[args.ds_key]
-        h5ad_path = cfg["h5ad"]
-
-        allowed_cols = DATASET_COLUMNS.get(args.ds_key, {})
-        col_key = args.col if args.col in allowed_cols else next(iter(allowed_cols), DEFAULT_COLUMN)
-
-        svg_template = cfg["svg"]
-        umap_col = cfg["umap_col"]
-        opacity = cfg["opacity"]
-        relative_svg_string = None
-
-        for f in [h5ad_path, svg_template]:
-            if not os.path.exists(f):
-                print(f"Error: file not found: {f}")
-                sys.exit(1)
-
-        if args.ds_key == 'rice' and col_key == 'CAxCondition':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellAnnotation', 'Condition', umap_col
-            )
-        elif args.ds_key == 'at_root_rs' and col_key == 'TypexGenotype':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'Celltype', 'Genotype', umap_col
-            )
-        elif args.ds_key == 'at_seed_martin':
-            if col_key == 'level_3_annotation_full_timed':
-                svg_template = cfg.get("svg_l3", svg_template)
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, args.gene,
-                    'level_3_annotation_full_timed', None,
-                    umap_col
-                )
-            else:
-                expression_dict, gene_name, umap_df = load_all(
-                    h5ad_path, args.gene,
-                    'level_2_annotation_timed', 'level_1_annotation_timed',
-                    umap_col
-                )
-        elif args.ds_key == 'at_flower_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_silique_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_stem_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_seed_0d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_rosette_21d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_shoot_zhang':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'celltype_after', None, umap_col
-            )
-        elif args.ds_key == 'at_rosette_30d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_seedling_3d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_seedling_6d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
-        elif args.ds_key == 'at_seedling_12d_lee':
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, 'CellType', None, umap_col
-            )
+        if args.local:
+            # ── Local server mode — interactive, like bardev ─────────────
+            _run_local_server(port=args.port, api_base=args.api_base)
         else:
-            expression_dict, gene_name, umap_df = load_all(
-                h5ad_path, args.gene, col_key, None, umap_col
+            # ── CLI mode (bardev) — write a single HTML file ─────────────
+            if not args.ds_key:
+                parser.error("ds_key is required in CLI mode (or use --local)")
+            if not args.gene:
+                parser.error("gene is required in CLI mode (or use --local)")
+
+            cfg = DATASETS[args.ds_key]
+            h5ad_path = cfg["h5ad"]
+            svg_template = cfg["svg"]
+            opacity = cfg["opacity"]
+
+            allowed_cols = DATASET_COLUMNS.get(args.ds_key, {})
+            col_key = args.col if args.col in allowed_cols else next(iter(allowed_cols), DEFAULT_COLUMN)
+
+            if args.ds_key == 'at_seed_martin' and col_key == 'level_3_annotation_full_timed':
+                svg_template = cfg.get("svg_l3", svg_template)
+
+            for f in [h5ad_path, svg_template]:
+                if not os.path.exists(f):
+                    print(f"Error: file not found: {f}")
+                    sys.exit(1)
+
+            expression_dict, gene_name, umap_df, std_dict = _load_h5ad_dispatch(
+                args.ds_key, col_key, cfg, args.gene
+            )
+            html = render_page(
+                args.ds_key, col_key, expression_dict, gene_name, umap_df,
+                svg_template, opacity, std_dict=std_dict,
             )
 
-        # ── Absolute SVG ─────────────────────────────────────────────────────
-        ET.register_namespace('', 'http://www.w3.org/2000/svg')
-        svg_tree, cell_types = color_svg(
-            svg_template,
-            expression_dict,
-            args.ds_key,
-            gene_name=gene_name,
-            opacity=opacity
-        )
-        buf = io.BytesIO()
-        svg_tree.write(buf, encoding='utf-8', xml_declaration=False)
-        svg_string = buf.getvalue().decode('utf-8')
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(html)
 
-        # ── Relative SVG ─────────────────────────────────────────────────────
-        _RELATIVE_CONTROL = {
-            'arabidopsis_nat': 'W0',
-            'rice': 'WW',
-            'at_root_rs': 'Col-0',
-            'at_seed_martin': 'median',
-            'at_flower_lee': 'median',
-            'at_silique_lee': 'median',
-            'at_stem_lee': 'median',
-            'at_seed_0d_lee': 'median',
-            'at_rosette_21d_lee': 'median',
-            'at_shoot_zhang': 'median',
-            'at_rosette_30d_lee': 'median',
-            'at_seedling_3d_lee': 'median',
-            'at_seedling_6d_lee': 'median',
-            'at_seedling_12d_lee': 'median',
-        }
-        rel_control = _RELATIVE_CONTROL.get(args.ds_key)
-        if rel_control:
-            ET.register_namespace('', 'http://www.w3.org/2000/svg')
-            svg_tree_rel, _ = color_svg(
-                svg_template,
-                expression_dict,
-                args.ds_key,
-                gene_name=gene_name,
-                opacity=opacity,
-                control=rel_control,
+            print(f"Written to: {args.output}")
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Local Flask server — replaces Apache/CGI for local testing
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _run_local_server(port=8080, api_base=None):
+    """
+    Serve the eFP viewer locally.  The HTML form already submits
+    GET /?ds=...&col=...&gene=...  — Flask just catches those params
+    the same way CGI does, but fetches data from BAR_API instead of
+    reading h5ad files.
+    """
+    global BAR_API_BASE
+    if api_base:
+        BAR_API_BASE = api_base
+
+    from flask import Flask, request as req
+
+    app = Flask(__name__)
+
+    @app.route("/")
+    def viewer():
+        ds_key  = req.args.get("ds",   DEFAULT_DATASET)
+        col_key = req.args.get("col",  DEFAULT_COLUMN)
+        gene_id = req.args.get("gene", DATASET_DEFAULT_GENES.get(ds_key, DEFAULT_GENE))
+
+        if ds_key not in DATASETS:
+            ds_key = DEFAULT_DATASET
+
+        allowed_cols = DATASET_COLUMNS.get(ds_key, {})
+        if col_key not in allowed_cols:
+            col_key = next(iter(allowed_cols), DEFAULT_COLUMN)
+
+        cfg = DATASETS[ds_key]
+        opacity = cfg["opacity"]
+
+        svg_template = cfg.get("svg_local", cfg["svg"])
+        if ds_key == 'at_seed_martin' and col_key == 'level_3_annotation_full_timed':
+            svg_template = cfg.get("svg_l3_local", cfg.get("svg_l3", svg_template))
+
+        if not os.path.exists(svg_template):
+            return (
+                f"<pre style='color:red'>SVG not found: {svg_template}\n"
+                f"Put SVGs in: {_SCRIPT_DIR}</pre>"
+            ), 404
+
+        try:
+            expression_dict, gene_name, umap_df, std_dict = load_all_from_api(ds_key, gene_id)
+            return render_page(
+                ds_key, col_key, expression_dict, gene_name, umap_df,
+                svg_template, opacity, std_dict=std_dict,
             )
-            buf_rel = io.BytesIO()
-            svg_tree_rel.write(buf_rel, encoding='utf-8', xml_declaration=False)
-            relative_svg_string = buf_rel.getvalue().decode('utf-8')
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return f"<pre style='color:red'>Error: {e}</pre>", 500
 
-        umap_div = build_umap_div(umap_df, gene_name) if umap_df is not None else None
-        violin_div = build_violin_div(umap_df, gene_name, cell_types_order=cell_types) if umap_df is not None else None
-        html = build_html(svg_string, umap_div, gene_name,
-                          active_ds_key=args.ds_key, active_col=col_key,
-                          relative_svg_string=relative_svg_string,
-                          cell_types=cell_types,
-                          violin_div=violin_div)
-
-        with open(args.output, 'w', encoding='utf-8') as f:
-            f.write(html)
-
-        print(f"Written to: {args.output}")
+    print(f"\n  eFP Viewer running on http://localhost:{port}/")
+    print(f"  BAR API:  {BAR_API_BASE}")
+    print(f"  SVGs:     {_SCRIPT_DIR}")
+    print(f"  Ctrl+C to stop.\n")
+    app.run(host="127.0.0.1", port=port, debug=True)
 
 
 if __name__ == "__main__":

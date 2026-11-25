@@ -68,60 +68,22 @@ from datetime import datetime
 from pathlib import Path
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dataset_config"))
+from dataset_config import umap_columns, umap_ready_keys, ROOT_GENO_PREFIX
 
 # ---------------------------------------------------------------------------
-# Dataset registry
+# Dataset registry — now sourced from dataset_config.yaml (see
+# dataset_config.py), shared with mini_app.py and
+# generate_pseudobulk_dumps.py, instead of a local copy here.
 # ---------------------------------------------------------------------------
 
-DATASETS = {
-    "arabidopsis_nat": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/arabidopsis_nat.h5ad",
-        "umap_col": "label_majorXcondition",
-        "db_name": "arabidopsis_NIE_umap",
-        "gene_id_col": "TAIR_ID",
-    },
-    "rice": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/RiceOW.h5ad",
-        "umap_col": "CellAnnotation",
-        "umap_col2": "Condition",   # combined as "{Condition}_{CellAnnotation}" — matches pseudobulk data_bot_id
-        "db_name": "rice_OW_umap",
-    },
-    "at_root_rs": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_root_shahan.h5ad",
-        "umap_col": "Celltype",
-        "umap_col2": "Genotype",    # combined as "{genotype_code}_{Celltype}" via _ROOT_GENO_PREFIX
-        "db_name": "arabidopsis_root_shahan_umap",
-    },
-    "at_seed_martin": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_seed_martin.h5ad",
-        "umap_col": "level_2_annotation_timed",
-        "db_name": "arabidopsis_seed_martin_umap",
-    },
-    "at_flower_lee": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_flower_lee.h5ad",
-        "umap_col": "CellType",
-        "db_name": "arabidopsis_flower_lee_umap",
-    },
-    "at_silique_lee": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_silique_lee.h5ad",
-        "umap_col": "CellType",
-        "db_name": "arabidopsis_silique_lee_umap",
-    },
-    "at_stem_lee": {
-        "h5ad": "/mnt/home/sqiao/h5ad_files/at_stem_lee.h5ad",
-        "umap_col": "CellType",
-        "db_name": "arabidopsis_stem_lee_umap",
-    },
-}
+DATASETS = {ds_key: umap_columns(ds_key) for ds_key in umap_ready_keys()}
 
 # Genotype prefix in SVG element ids for each raw obs Genotype value.
-# Mirrors _ROOT_GENO_PREFIX in generate_pseudobulk_dumps.py exactly — keep
-# these two tables in sync if the root dataset's genotype labels ever change.
-_ROOT_GENO_PREFIX = {
-    'Col-0 (shr2)': 'shr2',
-    'Ler (scr4)':   'scr4',
-    'Col-0':        'col0',
-}
+# Now sourced from dataset_config.yaml's root_genotype_prefix — previously
+# a local copy of the identical table in generate_pseudobulk_dumps.py, kept
+# in sync by hand via a comment in both files.
+_ROOT_GENO_PREFIX = ROOT_GENO_PREFIX
 
 # ---------------------------------------------------------------------------
 # SQL templates — mysqldump-compatible format

@@ -1,0 +1,315 @@
+# dataset_config.yaml
+# ─────────────────────────────────────────────────────────────────────────
+# Single source of truth for per-dataset h5ad metadata wiring, shared by
+# mini_app.py, generate_pseudobulk_dumps.py, and generate_umap_dumps.py.
+#
+# This consolidates THREE independent copies of essentially the same
+# information that had drifted in small ways:
+#   - mini_app.py's ds_key -> (cell_type_col, cell_type_col_2) dispatch,
+#     duplicated across its GET/POST/CLI handlers (fixed separately).
+#   - generate_pseudobulk_dumps.py's DATASETS dict, keyed by SHORT names
+#     ("arabidopsis", "at_root", "at_seed", ...) instead of the ds_key
+#     used everywhere else, and missing the newer Lee/Zhang datasets.
+#   - generate_umap_dumps.py's DATASETS dict, keyed by the same ds_key as
+#     mini_app.py, but with its own copy of _ROOT_GENO_PREFIX — a table
+#     that generate_pseudobulk_dumps.py ALSO hardcodes, with a comment in
+#     each script telling you to manually keep them in sync. That comment
+#     is the tell that this needed to be one table, not two.
+#   - Their pseudobulk/UMAP MySQL db names themselves already disagree in
+#     one place — see at_root_rs below — which is exactly the kind of
+#     silent drift a shared config prevents going forward (the mismatch
+#     is preserved here rather than "fixed", since a real deployed
+#     database uses these names — see the field comment).
+#
+# Fields
+# ------
+#   label            Human-readable name shown in the mini_app dataset picker.
+#   h5ad             Path to the .h5ad file.
+#   svg              Path to the SVG tissue template (mini_app only).
+#   svg_l3           Optional. Alternate SVG template for a more granular
+#                    annotation level (seed_martin level 3 only, currently).
+#   cell_type_col    The obs column holding the primary cell-type/tissue
+#                    label. Used by all three scripts.
+#   cell_type_col_2  Optional. Secondary obs column (condition, genotype, or
+#                    a coarser annotation level) for datasets keyed on two
+#                    columns together, combined as "{col2}_{col1}". Used by
+#                    mini_app.py and generate_pseudobulk_dumps.py.
+#   umap_col2        Optional. generate_umap_dumps.py's own secondary
+#                    column. For rice and at_root_rs this happens to equal
+#                    cell_type_col_2 — but NOT for at_seed_martin, whose
+#                    pseudobulk/mini_app default combines two annotation
+#                    levels while its UMAP dump uses level_2 alone. Kept as
+#                    a separate field rather than inferred from
+#                    cell_type_col_2, precisely because they can diverge.
+#   umap_col         obs column used to label UMAP points. Falls back to
+#                    cell_type_col in code if absent from a given h5ad file.
+#   opacity          Default fill opacity for colored SVG shapes (mini_app).
+#   gene_id_col      Optional. var column supplying external gene IDs
+#                    (e.g. "TAIR_ID"); falls back to var_names when unset.
+#                    Used by the two dump generators.
+#   use_logcounts    Optional bool. If true, fall back to the `logcounts`
+#                    layer when adata.X is empty (the Lee datasets export
+#                    with an empty X). Used by generate_pseudobulk_dumps.py.
+#   post_process     Optional. Names an extra expansion step a dump
+#                    generator must run after the raw per-obs-value
+#                    average/std is computed. Currently only "root" is
+#                    defined — see root_genotype_prefix / root_h5ad_to_svg_ids
+#                    below for the table it uses.
+#   db_name_pseudobulk / db_name_umap
+#                    MySQL database names for the two dump generators.
+#                    Omitted for datasets that don't have that dump yet
+#                    (the newer Lee/Zhang additions below).
+#
+# `alt_columns` lists request-time column alternates for mini_app.py (e.g.
+# seed_martin's level_2 vs level_3 view, rice's condition-combined view),
+# keyed by the col_key value a request can ask for.
+#
+# `legacy_key_aliases` lets generate_pseudobulk_dumps.py's existing --ds
+# CLI flags (arabidopsis / at_root / at_seed / ...) keep working without
+# retyping commands, while the config itself is keyed consistently with
+# mini_app.py and generate_umap_dumps.py.
+
+datasets:
+  arabidopsis_nat:
+    label: "Arabidopsis Drought (Illouz-Eliaz et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/illouz-eliaz_2025_at"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/illouz-eliaz_2025_at.svg"
+    cell_type_col: "label_majorXcondition"
+    umap_col: "label_majorXcondition"
+    opacity: 1.0
+    gene_id_col: "TAIR_ID"
+    db_name_pseudobulk: "arabidopsis_NIE_pseudobulk"
+    db_name_umap: "arabidopsis_NIE_umap"
+
+  rice:
+    label: "Rice Drought-Salinity (Robertson et al., 2026)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/robertson_2026_rice.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/robertson_2026_rice.svg"
+    umap_col: "CellAnnotation"
+    opacity: 1.0
+    # generate_pseudobulk_dumps.py and generate_umap_dumps.py always use
+    # the combined key ("{Condition}_{CellAnnotation}"); mini_app.py's
+    # default column view is CellAnnotation alone, with the combined view
+    # available under alt_columns.CAxCondition (see below).
+    cell_type_col: "CellAnnotation"
+    cell_type_col_2: "Condition"
+    umap_col2: "Condition"
+    db_name_pseudobulk: "rice_OW_pseudobulk"
+    db_name_umap: "rice_OW_umap"
+    alt_columns:
+      CAxCondition:
+        cell_type_col: "CellAnnotation"
+        cell_type_col_2: "Condition"
+
+  at_root_rs:
+    label: "Arabidopsis Root (Shahan et al., 2022)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/shahan_2022_at_root.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/shahan_2022_at_root.svg"
+    umap_col: "Celltype"
+    opacity: 1.0
+    cell_type_col: "Celltype"
+    cell_type_col_2: "Genotype"
+    umap_col2: "Genotype"
+    post_process: "root"
+    db_name_pseudobulk: "arabidopsis_root_rs_pseudobulk"
+    # NOTE: this really is "root_shahan", not "root_rs" — the pseudobulk
+    # and UMAP db names for this dataset already disagree in production.
+    # Preserved as-is rather than silently renamed; if you ever recreate
+    # these databases, this is a good moment to make them match.
+    db_name_umap: "arabidopsis_root_shahan_umap"
+    alt_columns:
+      TypexGenotype:
+        cell_type_col: "Celltype"
+        cell_type_col_2: "Genotype"
+
+  at_seed_martin:
+    label: "Arabidopsis Seed (Martin et al., 2026)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/martin_2026_at_seed.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/martin_2026_at_seed.svg"
+    svg_l3: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/martin_2026_at_seed_l3.svg"
+    cell_type_col: "level_2_annotation_timed"
+    cell_type_col_2: "level_1_annotation_timed"
+    umap_col: "level_2_annotation_timed"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_seed_martin_pseudobulk"
+    db_name_umap: "arabidopsis_seed_martin_umap"
+    alt_columns:
+      level_3_annotation_full_timed:
+        cell_type_col: "level_3_annotation_full_timed"
+        svg: "svg_l3"   # tells the loader to use cfg["svg_l3"] instead of cfg["svg"]
+
+  at_flower_lee:
+    label: "Arabidopsis Flower (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_flower.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_flower.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    use_logcounts: true
+    db_name_pseudobulk: "arabidopsis_flower_lee_pseudobulk"
+    db_name_umap: "arabidopsis_flower_lee_umap"
+
+  at_silique_lee:
+    label: "Arabidopsis Silique (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_silique.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_silique.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    use_logcounts: true
+    db_name_pseudobulk: "arabidopsis_silique_lee_pseudobulk"
+    db_name_umap: "arabidopsis_silique_lee_umap"
+
+  at_stem_lee:
+    label: "Arabidopsis Stem (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_stem.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_stem.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    use_logcounts: true
+    db_name_pseudobulk: "arabidopsis_stem_lee_pseudobulk"
+    db_name_umap: "arabidopsis_stem_lee_umap"
+
+  # ── Datasets below were wired into mini_app.py before either dump
+  # generator, and now also have db_name_pseudobulk / db_name_umap set.
+  # None of these carry a `condition`/secondary column, so their only
+  # pseudobulk "grouping" beyond per-cell-type is the automatic
+  # Mean_CTRL all-cell row every dataset gets (see MEAN_CTRL_BOT_ID in
+  # generate_pseudobulk_dumps.py) — that's what feeds the relative view
+  # for them. Confirmed .X-constructed (unlike the three "_lee" datasets
+  # above), so use_logcounts is left unset/false for all of them.
+
+  at_seed_0d_lee:
+    label: "Arabidopsis Seed — 0 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_seed_0d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seed_0d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_seed_0d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_seed_0d_lee_umap"
+
+  at_rosette_21d_lee:
+    label: "Arabidopsis Rosette — 21 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_rosette_21d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_rosette_21d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_rosette_21d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_rosette_21d_lee_umap"
+
+  at_shoot_zhang:
+    label: "Arabidopsis Shoot (Zhang et al., 2021)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/zhang_2021_at_shoot.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/zhang_2021_at_shoot.svg"
+    cell_type_col: "celltype_after"
+    umap_col: "celltype_after"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_shoot_zhang_pseudobulk"
+    db_name_umap: "arabidopsis_shoot_zhang_umap"
+
+  at_rosette_30d_lee:
+    label: "Arabidopsis Rosette — 30 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_rosette_30d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_rosette_30d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_rosette_30d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_rosette_30d_lee_umap"
+
+  at_seedling_3d_lee:
+    label: "Arabidopsis Seedling — 3 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_seedling_3d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_3d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_seedling_3d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_seedling_3d_lee_umap"
+
+  at_seedling_6d_lee:
+    label: "Arabidopsis Seedling — 6 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_seedling_6d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_6d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_seedling_6d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_seedling_6d_lee_umap"
+
+  at_seedling_12d_lee:
+    label: "Arabidopsis Seedling — 12 DAP (Lee et al., 2025)"
+    h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_seedling_12d.h5ad"
+    svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_seedling_12d.svg"
+    cell_type_col: "CellType"
+    umap_col: "CellType"
+    opacity: 1.0
+    db_name_pseudobulk: "arabidopsis_seedling_12d_lee_pseudobulk"
+    db_name_umap: "arabidopsis_seedling_12d_lee_umap"
+
+
+# generate_pseudobulk_dumps.py's --ds flag historically used short keys
+# that don't match ds_key elsewhere (arabidopsis, at_root, at_seed, ...).
+# Kept as aliases so existing command lines / muscle memory keep working;
+# the config itself is keyed by the canonical ds_key above.
+legacy_key_aliases:
+  arabidopsis: arabidopsis_nat
+  at_root: at_root_rs
+  at_seed: at_seed_martin
+  at_flower: at_flower_lee
+  at_silique: at_silique_lee
+  at_stem: at_stem_lee
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Shared root-dataset (Shahan et al.) mapping tables.
+#
+# Previously hardcoded THREE times: mini_app.py's `h5ad_to_id` dict (in the
+# Genotype coloring branch), generate_pseudobulk_dumps.py's
+# `_ROOT_H5AD_TO_ID` / `_ROOT_GENO_PREFIX`, and generate_umap_dumps.py's own
+# `_ROOT_GENO_PREFIX` copy — the latter two even carried a comment telling
+# you to manually keep them in sync. One table, read by all three.
+# ─────────────────────────────────────────────────────────────────────────
+
+# Raw obs Genotype value -> short code used in SVG element ids.
+root_genotype_prefix:
+  "Col-0 (shr2)": shr2
+  "Ler (scr4)": scr4
+  "Col-0": col0
+
+# Raw "{Genotype}_{Celltype}" obs combination -> list of SVG element ids
+# that should all receive the same value.
+root_h5ad_to_svg_ids:
+  "Col-0 (shr2)_Root endodermis": [shr2_top_endodermis, shr2_side_endodermis, shr2_tip_endodermis]
+  "Col-0 (shr2)_Collumella root cap": [shr2_tip_columella]
+  "Col-0 (shr2)_Lateral root cap": [shr2_tip_lateral_root_cap]
+  "Col-0 (shr2)_Phloem": [shr2_top_phloem, shr2_side_phloem]
+  "Col-0 (shr2)_Root procambium": [shr2_top_procambium, shr2_side_procambium]
+  "Col-0 (shr2)_Root cortex": [shr2_tip_cortex, shr2_top_cortex, shr2_side_cortex]
+  "Col-0 (shr2)_Xylem pole pericycle": [shr2_xpp_circle]
+  "Col-0 (shr2)_Protoxylem": [shr2_proto_circle]
+  "Col-0 (shr2)_Phloem pole pericycle": [shr2_ppp_circle]
+  "Col-0 (shr2)_Metaxylem": [shr2_meta_circle]
+  "Ler (scr4)_Root endodermis": [scr4_top_endodermis, scr4_side_endodermis, scr4_tip_endodermis]
+  "Ler (scr4)_Collumella root cap": [scr4_tip_columella]
+  "Ler (scr4)_Lateral root cap": [scr4_tip_lateral_root_cap]
+  "Ler (scr4)_Phloem": [scr4_top_phloem, scr4_side_phloem]
+  "Ler (scr4)_Root procambium": [scr4_top_procambium, scr4_side_procambium]
+  "Ler (scr4)_Root cortex": [scr4_tip_cortex, scr4_top_cortex, scr4_side_cortex]
+  "Ler (scr4)_Xylem pole pericycle": [scr4_xpp_circle]
+  "Ler (scr4)_Protoxylem": [scr4_proto_circle]
+  "Ler (scr4)_Phloem pole pericycle": [scr4_ppp_circle]
+  "Ler (scr4)_Metaxylem": [scr4_meta_circle]
+  "Col-0_Root endodermis": [col0_top_endodermis, col0_side_endodermis, col0_tip_endodermis]
+  "Col-0_Collumella root cap": [col0_tip_columella]
+  "Col-0_Lateral root cap": [col0_tip_lateral_root_cap]
+  "Col-0_Phloem": [col0_top_phloem, col0_side_phloem]
+  "Col-0_Root procambium": [col0_top_procambium, col0_side_procambium]
+  "Col-0_Root cortex": [col0_tip_cortex, col0_top_cortex, col0_side_cortex]
+  "Col-0_Xylem pole pericycle": [col0_xpp_circle]
+  "Col-0_Protoxylem": [col0_proto_circle]
+  "Col-0_Phloem pole pericycle": [col0_ppp_circle]
+  "Col-0_Metaxylem": [col0_meta_circle]

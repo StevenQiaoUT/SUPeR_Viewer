@@ -1,159 +1,190 @@
-import anndata as ad
-import numpy as np
-import scipy.sparse as sp
-
-adata1 = ad.read_h5ad("control_full.h5ad")
-
-print(adata1)
-print(adata1.obs['CellType'].unique())
-
-
+#!/usr/bin/env python3
 """
-del adata1.obs['nCount_RNA']
-del adata1.obs['nFeature_RNA']
-del adata1.obs['orig.ident']
-del adata1.obs['percent.mt']
-del adata1.obs['percent.cp']
-del adata1.obs['integrated_snn_res.0.5']
-del adata1.obs['seurat_clusters']
-del adata1.obs['ident']
-del adata1.uns
-del adata1.layers
-del adata1.obsm['PCA']
-del adata1.obsm['UMAP']
+unpack.py — h5ad metadata sniffer
+==================================
 
-adata1.write_h5ad("silique_slim.h5ad", compression='gzip')
+Every new dataset export names its cell-type column differently
+("CellType", "label_major", "label_majorXcondition", "Celltype",
+"celltype_after", ...), so a fully-automated `unpack.py <file> --gene X`
+CLI just trades one failure mode ("wrong hardcoded column") for another
+("guessed the wrong column silently"). This script does NOT try to guess
+and run — it's a read-only report: point it at an .h5ad and it prints
+every obs column, flags the ones that *look* like cell-type/tissue labels
+using a small plant-biology vocabulary, and shows sample values so you can
+pick the right one by eye in a few seconds instead of trial-and-error runs
+against the full pipeline.
 
-adata1.raw = None
+Usage
+-----
+    python unpack.py path/to/file.h5ad
+    python unpack.py path/to/file.h5ad --top 8
+    python unpack.py path/to/file.h5ad --vocab suspensor cambial
+    python unpack.py path/to/file.h5ad --yaml-stub my_dataset_key
 
-del adata1.obs['nCount_RNA']
-del adata1.obs['nFeature_RNA']
-del adata1.obs['orig.ident']
-del adata1.obs['percent.mt']
-del adata1.obs['percent.cp']
-del adata1.obs['integrated_snn_res.0.5']
-del adata1.obs['seurat_clusters']
-del adata1.obs['ident']
-del adata1.uns
-del adata1.layers
-
-adata1.write_h5ad("flower_slim.h5ad", compression='gzip')
-
+Nothing here writes to the h5ad or touches X/layers beyond checking their
+names — this is inspection only.
 """
-"""
-adata = sc.read_h5ad("my_file.h5ad")
+import argparse
+import sys
 
-print(adata)
-print(adata.X)
-for cat in adata.obs['level_1_annotation_timed'].cat.categories:
-    print(cat)
-for cat in adata.obs['level_2_annotation_timed'].cat.categories:
-    print(cat)
-for cat in adata.obs['level_3_annotation_abbr'].cat.categories:
-    print(cat)
-for cat in adata.obs['level_3_annotation_full_timed'].cat.categories:
-    print(cat)
-print(adata.layers['logcounts'])
-
-cols_to_keep = [
-    'level_1_annotation_timed',
-    'level_2_annotation_timed',
-    'level_3_annotation_full_timed',
-    'level_3_annotation_abbr'
+# ── Vocabulary ──────────────────────────────────────────────────────────────
+# Deliberately a flat, case-insensitive substring list, not an ontology.
+# Extend this as new datasets introduce new tissue/cell-type terms —
+# the point is to catch *most* obs columns worth looking at, not all of them.
+CELL_TYPE_VOCAB = [
+    "mesophyll", "epidermis", "epidermal", "guard cell", "guard_cell",
+    "trichome", "phloem", "xylem", "cortex", "endodermis", "pericycle",
+    "cambium", "cambial", "parenchyma", "meristem", "meristematic", "sieve",
+    "companion cell", "stele", "columella", "root cap", "root_cap",
+    "procambium", "vascular", "stomat", "collenchyma", "sclerenchyma",
+    "tracheid", "protoxylem", "metaxylem", "seed coat", "endosperm",
+    "embryo", "cotyledon", "hypocotyl", "shoot apical", "suspensor",
+    "unlabeled", "unlabelled", "unknown", "quiescent",
 ]
 
-adata.obs = adata.obs[cols_to_keep]
+# Columns whose *names* strongly suggest cell-type content, even before
+# checking values — bumps a column up the ranking without requiring a
+# vocab hit in the values (useful for coded/abbreviated labels).
+NAME_HINTS = ["celltype", "cell_type", "cell type", "annotation", "label", "type"]
 
-del adata.uns
-del adata.layers
-
-adata.write_h5ad("my_file_clean.h5ad", compression='gzip')
-print(adata)
-
-adata1.raw = None
-
-del adata1.obs['Orig.ident']
-del adata1.obs['nCount_RNA']
-del adata1.obs['nFeature_RNA']
-del adata1.obs['Percent.mt']
-del adata1.obs['Seurat_clusters']
-del adata1.obs['Dataset']
-del adata1.obs['Tissue']
-del adata1.obs['Organ']
-del adata1.obs['Condition']
-del adata1.obs['Libraries']
-del adata1.obs['ACE']
-
-adata1.write_h5ad('slim_root.h5ad', compression='gzip')
+# Columns whose names suggest they're never a cell-type column, no matter
+# what their values look like — QC/technical metadata gets deprioritized
+# even if a stray vocab word shows up in a free-text field.
+NAME_DEPRIORITIZE = [
+    "n_genes", "n_counts", "pct_counts", "total_counts", "doublet",
+    "barcode", "sample", "batch", "condition", "genotype", "replicate",
+    "timepoint", "index", "leiden", "louvain", "cluster",
+]
 
 
-adata_1 = sc.read_h5ad("OsLeafStressIntegrated.h5ad")
+def score_column(values, vocab):
+    """Return (# unique values containing a vocab hit, matched vocab terms)."""
+    hits = set()
+    matched_terms = set()
+    for v in values:
+        vl = str(v).lower()
+        for term in vocab:
+            if term in vl:
+                hits.add(v)
+                matched_terms.add(term)
+    return len(hits), sorted(matched_terms)
 
-print(adata_1)
-print(adata_1.obs)
-print(adata_1.var)
-print(adata_1.obs['CellAnnotation'].unique())
-print(adata_1.obs['Condition'].unique())
-print(adata_1.X[:5, :5])        # what are the actual values?
-print(adata_1.layers.keys())    # are there other layers (raw, counts, normalized)?
-print(adata_1.uns.keys())       # any metadata about normalization?
 
-adata_1.raw = None
+def name_bonus(col_name):
+    cl = col_name.lower()
+    if any(bad in cl for bad in NAME_DEPRIORITIZE):
+        return -1
+    if any(good in cl for good in NAME_HINTS):
+        return 1
+    return 0
 
-adata_1.obs = adata_1.obs.drop(columns=[
-    'Identity',
-    'nCount_RNA',
-    'nFeature_RNA',
-    'percent.mt',
-    'percent.pt',
-    'TissueSystem',
-    'Pseudotime'
 
-del adata_1.obs['Identity']
-del adata_1.obs['nCount_RNA']
-del adata_1.obs['nFeature_RNA']
-del adata_1.obs['percent.mt']
-del adata_1.obs['percent.pt']
-del adata_1.obs['TissueSystem']
-del adata_1.obs['Pseudotime']
-del adata_1.obsm['X_pca']
-del adata_1.varm['PCs']
-del adata_1.obsp['distances']
-del adata_1.uns['neighbors']
+def main():
+    parser = argparse.ArgumentParser(
+        description="Sniff an h5ad's obs columns for likely cell-type labels."
+    )
+    parser.add_argument("h5ad_path")
+    parser.add_argument("--top", type=int, default=6,
+                         help="Show this many top candidate columns in detail (default 6)")
+    parser.add_argument("--vocab", nargs="*", default=[],
+                         help="Extra vocabulary terms to check for, on top of the built-in list")
+    parser.add_argument("--max-samples", type=int, default=12,
+                         help="Max sample values to print per column (default 12)")
+    parser.add_argument("--yaml-stub", metavar="DATASET_KEY", default=None,
+                         help="Print a dataset_config.yaml stanza for the "
+                              "top-ranked column under this dataset key")
+    args = parser.parse_args()
 
-adata_1.write_h5ad('slim.h5ad', compression='gzip')
+    try:
+        import anndata as ad
+    except ImportError:
+        print("This script needs anndata (`pip install anndata`).", file=sys.stderr)
+        sys.exit(1)
 
-adata_2 = sc.read_h5ad('brapa.h5ad')
-print(adata_2)
+    vocab = CELL_TYPE_VOCAB + [v.lower() for v in args.vocab]
 
-adata_2.raw = None
+    print(f"Reading {args.h5ad_path} ...", file=sys.stderr)
+    # backed="r" avoids loading the (often huge) X matrix into memory just
+    # to look at obs — this is a metadata report, not an analysis step.
+    adata = ad.read_h5ad(args.h5ad_path, backed="r")
+    obs = adata.obs
 
-del adata_2.obs['orig.ident']
-del adata_2.obs['nCount_RNA']
-del adata_2.obs['nFeature_RNA']
-del adata_2.obs['nCount_SCT']
-del adata_2.obs['nFeature_SCT']
-del adata_2.obs['seurat_clusters']
-del adata_2.var['features']
-del adata_2.uns['neighbors']
-del adata_2.obsm['X_pca']
-del adata_2.varm['PCs']
-del adata_2.obsp['distances']
+    print(f"\n{adata.n_obs:,} cells x {adata.n_vars:,} genes")
+    print(f"obsm keys : {list(adata.obsm.keys())}")
+    print(f"layers    : {list(adata.layers.keys())}")
+    print(f"uns keys  : {list(adata.uns.keys())}")
 
-adata_2.write_h5ad("brapa_slim.h5ad", compression='gzip')
+    print(f"\n{'=' * 78}\nobs column report ({len(obs.columns)} columns)\n{'=' * 78}")
 
-adata_3 = sc.read_h5ad('maizleaf.h5ad')
-adata_3.raw = None
+    scored = []
+    for col in obs.columns:
+        series = obs[col]
+        dtype = series.dtype
+        is_textlike = dtype == object or str(dtype).startswith("category")
+        n_unique = series.nunique(dropna=True)
 
-print(adata_3)
+        hit_count, matched_terms = (0, [])
+        if is_textlike:
+            uniques = series.dropna().astype(str).unique().tolist()
+            hit_count, matched_terms = score_column(uniques, vocab)
+        else:
+            uniques = []
 
-del adata_3.obs['Orig.ident']
-del adata_3.obs['nCount_RNA']
-del adata_3.obs['nFeature_RNA']
-del adata_3.obs['Percent.mt']
-del adata_3.obs['Seurat_clusters']
-del adata_3.obs['Dataset']
-del adata_3.obs['ACE']
+        bonus = name_bonus(col)
+        # Cardinality sanity check: cell-type columns are rarely 2-3
+        # categories (that's usually condition/genotype) or thousands
+        # (that's usually a barcode or a numeric ID cast to string).
+        cardinality_ok = is_textlike and 3 <= n_unique <= 80
 
-adata_3.write_h5ad('maizleaf_slim.h5ad', compression='gzip')
-"""
+        rank_score = (hit_count * 2) + bonus + (1 if cardinality_ok else 0)
+        scored.append({
+            "col": col, "dtype": dtype, "n_unique": n_unique,
+            "is_textlike": is_textlike, "hit_count": hit_count,
+            "matched_terms": matched_terms, "uniques": uniques,
+            "rank_score": rank_score,
+        })
+
+    scored.sort(key=lambda r: r["rank_score"], reverse=True)
+
+    print(f"\nTop {min(args.top, len(scored))} candidates, ranked by vocabulary "
+          f"match + column-name hints + cardinality:\n")
+    for r in scored[:args.top]:
+        marker = "*" if r["hit_count"] > 0 else " "
+        print(f"{marker} {r['col']!r:38s} dtype={str(r['dtype']):10s} "
+              f"n_unique={r['n_unique']:5d}  score={r['rank_score']}")
+        if r["hit_count"]:
+            shown = ", ".join(r["matched_terms"][:6])
+            more = "..." if len(r["matched_terms"]) > 6 else ""
+            print(f"      vocab hits: {r['hit_count']} values matched ({shown}{more})")
+        if r["is_textlike"]:
+            sample = sorted(r["uniques"])[:args.max_samples]
+            trailing = "" if len(r["uniques"]) <= args.max_samples else ", ..."
+            print(f"      sample values: {sample}{trailing}")
+        print()
+
+    if len(scored) > args.top:
+        print(f"{'-' * 78}\nOther columns (lower-ranked)\n{'-' * 78}")
+        for r in scored[args.top:]:
+            print(f"  {r['col']!r:38s} dtype={str(r['dtype']):10s} n_unique={r['n_unique']}")
+
+    if args.yaml_stub:
+        best = scored[0] if scored else None
+        key = args.yaml_stub
+        col_name = best["col"] if best else "REPLACE_ME"
+        print(f"\n{'=' * 78}\nSuggested dataset_config.yaml stanza\n{'=' * 78}")
+        print(f"""
+{key}:
+  label: "REPLACE_ME (e.g. Species Tissue (Author et al., Year))"
+  h5ad: "{args.h5ad_path}"
+  svg: "REPLACE_ME path/to/template.svg"
+  cell_type_col: "{col_name}"   # <- verify this is right before committing
+  umap_col: "{col_name}"
+  opacity: 1.0
+""".strip())
+        print("\nDouble-check the sample values above actually read as cell "
+              "types before using this column name — this is a starting "
+              "guess, not a guarantee.")
+
+
+if __name__ == "__main__":
+    main()

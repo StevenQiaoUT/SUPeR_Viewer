@@ -7,21 +7,27 @@
 - [SVG Illustration](#svg-illustration)
 - [RDS/H5AD Data Manipulation](#rdsh5ad-data-manipulation)
   - [RDS to H5AD Conversion](#rds-to-h5ad-conversion)
-  - [MEX to H5AD Conversion](#mex-to-h5ad-conversion)
   - [Reducing H5AD Size](#reducing-h5ad-size)
   - [How Can I Convert from Raw Counts and Z-Score to Log-Normalization?](#how-can-i-convert-from-raw-counts-and-z-score-to-log-normalization)
-  - [MySQL Dump Generation](#mysql-dump-generation)
+  - [Choosing the Mean Control with check_control_candidates.py](#choosing-the-mean-control-with-check_control_candidatespy)
+- [MySQL Dump Generation](#mysql-dump-generation)
+  - [Dataset Configuration](#dataset-configuration)
 
 ---
 
 ## Software and Package Requirements
 
 - **R**: version 4.5.1
-  - Packages: Seurat, Matrix, anndata
+  - Packages: Seurat, Matrix, anndata (reticulate is also needed because `rds_to_h5ad.r` imports the Python anndata package)
 - **Python**: version 3.12.1
-  - Packages: json, xml, anndata, pathlib
+  - Packages: numpy, scipy, pandas, anndata, plotly, requests, PyYAML, scanpy, flask
 - **Inkscape**: version 1.4.2
   - Apply Transform extension for transform removal (instructions linked in original doc)
+- All Python packages are listed in `requirements.txt` at the root of the repository. To install everything at once:
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
@@ -279,7 +285,7 @@ This ensures that the total gene count in every cell sums to 10000.
 
 ### RDS to H5AD Conversion
 
-Whether it is from a researcher or the GEO database, you should convert the RDS file into an H5AD file. The script `rds_to_h5ad.r` extracts two components: 1) the RAW COUNT CellxGene matrix and 2) the UMAP coordinates, to produce a minimized H5AD file.
+Whether it is from a researcher or the GEO database, you should convert the RDS file into an H5AD file. The script `rds_to_h5ad.r` takes the RAW COUNT CellxGene matrix from the RDS file, log-normalizes it, and saves it together with the cell types and UMAP coordinates to produce a minimized H5AD file.
 
 #### Command Line Usage
 
@@ -352,9 +358,27 @@ ad$write_h5ad(h5ad_path)
 message("Done.")
 ```
 
-*(This R script conducts RDS → H5AD conversion with raw counts and UMAP coordinates.)*
+*(This R script conducts RDS → H5AD conversion with log-normalized counts and UMAP coordinates.)*
 
-#### Mini Python Normalization Script (when given a RAW COUNT H5AD directly, no RDS)
+**Important:** `rds_to_h5ad.r` already does the log-normalization for you. These lines divide every count by the cell's library size, multiply by 10000, and apply `log1p`, which is exactly the formula at the start of this section:
+
+```r
+lib_sizes <- Matrix::rowSums(counts_t)
+counts_t@x <- counts_t@x / lib_sizes[counts_t@i + 1L] * 1e4
+counts_t@x <- log1p(counts_t@x)
+```
+
+This means the H5AD that comes out of `rds_to_h5ad.r` is ready to use as is. Do **NOT** run `log_normalize.py` on it afterwards, otherwise the values get log-transformed twice and every expression level will be wrong.
+
+A few other things `rds_to_h5ad.r` does that are worth knowing:
+
+- Whatever the cell type column is called in the RDS metadata (passed as the 5th argument, default `CellType`), it is always saved as `CellType` in the H5AD obs. This is why `CellType` is the default column for both dump scripts.
+- The UMAP coordinates are always saved as `X_umap` in obsm, which is exactly where `generate_umap_dumps.py` looks for them.
+- Everything else in the RDS (other metadata columns, other assays, PCA, etc.) is left out to keep the H5AD small.
+
+#### `log_normalize.py`: Mini Python Normalization Script (when given a RAW COUNT H5AD directly, no RDS)
+
+It runs scanpy's `normalize_total` (`target_sum=1e4`) and `log1p`, which gives the same result as the R script above.
 
 ```python
 import scanpy as sc
@@ -379,10 +403,6 @@ adata1.write_h5ad("at_flower_lee_normalized.h5ad")
 adata2.write_h5ad("at_stem_lee_normalized.h5ad")
 adata3.write_h5ad("at_shoot_zhang_normalized.h5ad")
 ```
-
-### MEX to H5AD Conversion
-
-*(Another file format — section not elaborated in the source document.)*
 
 ### Reducing H5AD Size
 
@@ -460,12 +480,15 @@ While working with different datasets from many publications, the H5AD CellxGene
 
 #### Command Line Usage
 
-To generate a report of the statistical overview:
+To generate a report of the statistical overview, you can use `compile_normalization.py` (in the `h5ad_statistics_generation` folder):
 
 ```bash
-python3 aggregate_control_candidates.py
+python3 compile_normalization.py [preset name | all]
+python3 compile_normalization.py [h5ad file path] [cell type column]
+
 cd ~/h5ad_files
-/mnt/home/sqiao/venv/bin/python3 aggregate_control_candidates.py
+/mnt/home/sqiao/venv/bin/python3 compile_normalization.py all
+/mnt/home/sqiao/venv/bin/python3 compile_normalization.py lee_2025_at_root.h5ad CellType
 ```
 
 Patterns to get a quick first judgement:
@@ -483,13 +506,112 @@ If you have the RDS file or raw count H5AD, that is good news — you can use th
 
 If you have done some H5AD analysis and realize it has been z-score transformed, you can look for the RDS file on GEO, scPlantDB, or PlantscRNAdb to get a hold of the raw counts. To search effectively, use the publication information such as BioProject ID, Author Name, or GEO accession numbers.
 
-### MySQL Dump Generation
+### Choosing the Mean Control with check_control_candidates.py
 
-The SUPeR viewer requires two different scripts (`generate_umap_dumps.py` and `generate_pseudobulk_dumps.py`) to generate the expression values for SVG coloring and UMAP coordinates.
+The SUPeR Viewer has a relative view that colors each cell type by how much higher or lower it is than a control. Some datasets come with a clear biological control (e.g. well-watered vs. drought), but most of our datasets do not. For those, we need one control value per gene to use as the denominator:
+
+```
+relative expression = log2(cell type mean / control)
+```
+
+`check_control_candidates.py` computes several possible control values for every dataset so we can compare them side by side and pick the most sensible one. This comparison is how we settled on the `Mean_CTRL` value that `generate_pseudobulk_dumps.py` now writes for every gene.
 
 #### Command Line Usage
 
-*Note: no arguments means dumps for all H5ADs and n=10000 UMAP subsample.*
+*Note: the script loads the whole H5AD into memory, so the large datasets take a while.*
+
+```bash
+python3 check_control_candidates.py [preset name | all]
+python3 check_control_candidates.py [h5ad file path] [cell type column]
+
+/mnt/home/sqiao/venv/bin/python3 check_control_candidates.py all
+/mnt/home/sqiao/venv/bin/python3 check_control_candidates.py lee_2025_at_root.h5ad CellType
+```
+
+#### Most Important Column: Gene Mean
+
+If you only look at one number, look at **Gene Mean** in the gene-level sample at the bottom of the report. It is the mean of one gene across ALL cells in the dataset, zeros included, which is exactly the `Mean_CTRL` value stored in the pseudobulk dump for that gene. Candidate A (Global mean) is the same calculation pooled over every gene, so it is the dataset-wide version of `Mean_CTRL`.
+
+We use this one as the control because:
+
+- It includes the zeros, just like the cell type means (CT Mean) do, so the log2 ratio compares like with like
+- Our data is log1p-normalized, so the zeros are true zeros and should count
+- It is only 0 when the gene is never detected in the dataset, so we almost never divide by zero
+- A cell type above it is more highly expressed than the dataset average (positive log2 ratio), and a cell type below it is less expressed (negative log2 ratio)
+
+#### Header and Sparsity
+
+| Output | What it means |
+| --- | --- |
+| cells × genes | Size of the matrix being checked |
+| ct_col | The obs column used for cell types |
+| loaded in | How long the H5AD took to load, in seconds |
+| Sparsity | Percentage of all entries that are 0. Most of our datasets are above 90% |
+| Non-zero range | The smallest and largest non-zero value |
+
+#### Global Control Candidates (one number for the whole dataset)
+
+| Candidate | How it is calculated | How to read it |
+| --- | --- | --- |
+| A) Global mean (incl. zeros) | Sum of every value ÷ (cells × genes) | Dataset-wide version of Mean_CTRL. The one we went with |
+| B) Global median (incl. zeros) | Middle value of the whole matrix | Almost always 0 because more than half the matrix is 0, so it cannot be used as a denominator |
+| C) Non-zero mean | Average of only the values above 0 | Ignores dropouts, so it is much higher than A |
+| D) Non-zero median | Middle value of only the values above 0 | Like C but less affected by a few very high values |
+| P25 / P50 / P75 / P90 | Percentiles of the non-zero values | Shows how spread out the detected values are. P50 is the same as D |
+
+#### Aggregated Per-Cell-Type Candidates
+
+| Candidate | How it is calculated | How to read it |
+| --- | --- | --- |
+| E) Mean of CT means | Average of every cell type's CT Mean, with each cell type counted once | Unlike A, a rare cell type counts as much as a common one |
+| F) Median of CT means | Middle CT Mean across cell types | Like E but not pulled by one unusual cell type |
+| G) Mean of CT non-zero medians | Average of every cell type's NZ Median | A zero-free version of E |
+
+#### Per-Cell-Type Breakdown (one row per cell type)
+
+| Column | What it means |
+| --- | --- |
+| Cell Type | The cell type name from the obs column |
+| Cells | Number of cells of that type |
+| CT Mean | Mean of every value in that cell type, zeros included. This is the numerator of the relative view, and the same thing the pseudobulk dump stores as data_signal (pooled over genes here) |
+| NZ Mean | Mean of only the non-zero values in that cell type |
+| NZ Median | Middle non-zero value in that cell type |
+| log₂(Mean/C) | CT Mean compared to candidate C. A preview of what the relative view would look like with C as the control |
+| log₂(Mean/D) | Same preview with candidate D as the control |
+
+**Note:** the two log₂ columns use C and D, which leave out the zeros, while CT Mean keeps them. Because of this, these columns are usually negative for every cell type. That is expected and is one of the reasons we did not choose C or D as the control.
+
+#### Spread Across Cell Types
+
+| Output | What it means |
+| --- | --- |
+| min / max | Lowest and highest CT Mean (or CT NZ Median) across cell types |
+| fold-range | max ÷ min. How many times higher the top cell type is than the bottom one |
+| CV | Coefficient of variation (standard deviation ÷ mean × 100). A small CV means the cell types are very similar; relative map will look washed out |
+
+#### Gene-Level Sample (5 random genes, same 5 every run)
+
+| Column | What it means |
+| --- | --- |
+| Gene | Gene ID (var_names) |
+| Gene Mean | Mean of that gene across all cells, zeros included. This IS Mean_CTRL for that gene |
+| Gene NZ Mean | Mean of that gene in only the cells where it is detected |
+| Gene NZ Med | Middle value of that gene in only the cells where it is detected |
+| % Expressing | Percentage of cells where the gene is detected (above 0) |
+
+This part shows how much the control changes from one gene to another, which is why `Mean_CTRL` is stored per gene instead of using one number for the whole dataset.
+
+---
+
+## MySQL Dump Generation
+
+The SUPeR viewer requires two different scripts (`generate_umap_dumps.py` and `generate_pseudobulk_dumps.py`) to generate the expression values for SVG coloring and UMAP coordinates.
+
+### Command Line Usage
+
+Both dump scripts can now be run in two ways. You do **NOT** need to edit any dictionary or config file to make a dump for a new H5AD.
+
+**Option 1:** a dataset already listed in `dataset_config.yaml` (see [Dataset Configuration](#dataset-configuration) below). No arguments means dumps for all datasets and n=10000 UMAP subsample.
 
 ```bash
 python generate_pseudobulk_dumps.py --ds [dataset names/paths] --outdir [output directory path]
@@ -498,9 +620,63 @@ python generate_umap_dumps.py --datasets [dataset names/paths] --outdir [output 
 /mnt/home/sqiao/venv/bin/python3 ~/public_html/cgi-bin/db_dump/generate_pseudobulk_dumps.py --ds at_root rice
 ```
 
+**Option 2:** any H5AD file, straight from the command line.
+
+```bash
+python generate_pseudobulk_dumps.py --h5ad [h5ad file path] --cell-type-col [obs column] --db-name [database name]
+python generate_umap_dumps.py --h5ad [h5ad file path] --umap-col [obs column] --db-name [database name] --max-cells [# of cells]
+```
+
+### Dataset Configuration
+
+Option 1 reads every dataset from one file, `dataset_config/dataset_config.yaml`, which is shared by `generate_pseudobulk_dumps.py`, `generate_umap_dumps.py`, and `mini_app.py`. In older versions of the scripts, each dump script had its own Python dictionary like this one:
+
+```python
+"at_flower": {
+    "db_name": "arabidopsis_flower_lee_pseudobulk",
+    "h5ad": "/mnt/home/sqiao/h5ad_files/at_flower_lee.h5ad",
+    "cell_type_col": "CellType",
+    "cell_type_col2": None,
+    "gene_id_col": None,
+    "use_logcounts": True,
+},
+```
+
+The same entry now lives in `dataset_config.yaml`:
+
+```yaml
+at_flower_lee:
+  label: "Arabidopsis Flower (Lee et al., 2025)"
+  h5ad: "/mnt/home/sqiao/h5ad_files/lee_2025_at_flower.h5ad"
+  svg: "/mnt/home/sqiao/public_html/cgi-bin/svg_templates/lee_2025_at_flower.svg"
+  cell_type_col: "CellType"
+  umap_col: "CellType"
+  opacity: 1.0
+  use_logcounts: true
+  db_name_pseudobulk: "arabidopsis_flower_lee_pseudobulk"
+  db_name_umap: "arabidopsis_flower_lee_umap"
+```
+
+Here is what each field means and how to fill it correctly:
+
+| Old dictionary field | dataset_config.yaml field | What it is | How to fill it correctly |
+| --- | --- | --- | --- |
+| "at_flower" (the key) | at_flower_lee (the key) | The dataset name you type after --ds / --datasets | Lowercase with underscores: species_tissue_author (e.g. at_root_shahan). The old short keys (at_flower, at_root, …) still work for --ds |
+| db_name | db_name_pseudobulk / db_name_umap | MySQL database name; dump file is named after it | Must match the database name on BAR API exactly. Format: species_tissue_author_pseudobulk (or _umap). Leave it out if that dump does not exist yet |
+| h5ad | h5ad | Full path to the H5AD on the server | Use the absolute path (/mnt/home/sqiao/…), not ~ |
+| cell_type_col | cell_type_col | obs column holding the cell types; its values become data_bot_id | Run unpack.py on the H5AD to find the column. Its values must match the SVG group ids (see SVG Illustration). Always CellType for rds_to_h5ad.r output |
+| cell_type_col2 | cell_type_col_2 (pseudobulk), umap_col2 (UMAP) | Second obs column for datasets split by condition or genotype | Only fill this when the SVG has one shape per condition/genotype + cell type (e.g. rice's Condition, root's Genotype). Otherwise None (Python) or leave the line out (YAML) |
+| gene_id_col | gene_id_col | var column holding the gene models (AGI IDs) | Only needed when var_names are gene symbols (e.g. SZF1) and the AGI IDs are in another var column (e.g. TAIR_ID). Otherwise None / leave it out |
+| use_logcounts | use_logcounts | Use the logcounts layer when X is empty | True only when compile_normalization.py says X is empty and the log-normalized values are in layers["logcounts"] (the Lee flower, silique, and stem datasets). Otherwise False / leave it out |
+| — | umap_col | obs column used to label UMAP points | Usually the same as cell_type_col |
+| — | label, svg, svg_l3, opacity, alt_columns | Settings only mini_app.py uses (dataset name in the dropdown, SVG template path, fill opacity, alternate views) | label = "Species Tissue (Author et al., Year)"; svg = path to the finished SVG template |
+| — | post_process | An extra step after the means are computed | Only "root" exists (the Shahan root dataset). Leave it out for new datasets |
+
+**Note:** if you only need a one-time dump, use Option 2 instead of adding the dataset to `dataset_config.yaml`. Add it to the YAML once the dataset is going live, so `mini_app.py` and both dump scripts all agree on the same settings.
+
 The annotations and comments must conform to the current existing sample dumps on BAR API.
 
-#### Pseudobulk Dump
+### Pseudobulk Dump
 
 The pseudobulk dump has 1 table containing 4 columns:
 
@@ -528,7 +704,7 @@ CREATE TABLE `sample_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 ```
 
-#### UMAP Dump
+### UMAP Dump
 
 The UMAP dump has two separate tables:
 
@@ -544,11 +720,6 @@ CREATE TABLE `umap_coords` (
   PRIMARY KEY (`cell_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-TABLE_DDL_EXPRESSION = """
---
--- Table structure for table `umap_expression`
---
 
 DROP TABLE IF EXISTS `umap_expression`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

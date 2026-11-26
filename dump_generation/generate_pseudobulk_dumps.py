@@ -23,22 +23,31 @@ Output files (one per dataset):
     arabidopsis_seedling_12d_lee_pseudobulk_dump.sql
 
 Usage:
-    python generate_pseudobulk_dumps.py
-    python generate_pseudobulk_dumps.py --ds arabidopsis   # single dataset
-    python generate_pseudobulk_dumps.py --ds rice
-    python generate_pseudobulk_dumps.py --ds at_root
-    python generate_pseudobulk_dumps.py --ds at_seed
-    python generate_pseudobulk_dumps.py --ds at_flower
-    python generate_pseudobulk_dumps.py --ds at_silique
-    python generate_pseudobulk_dumps.py --ds at_stem
-    python generate_pseudobulk_dumps.py --ds at_seed_0d_lee
-    python generate_pseudobulk_dumps.py --ds at_rosette_21d_lee
-    python generate_pseudobulk_dumps.py --ds at_shoot_zhang
-    python generate_pseudobulk_dumps.py --ds at_rosette_30d_lee
-    python generate_pseudobulk_dumps.py --ds at_seedling_3d_lee
-    python generate_pseudobulk_dumps.py --ds at_seedling_6d_lee
-    python generate_pseudobulk_dumps.py --ds at_seedling_12d_lee
-    python generate_pseudobulk_dumps.py --outdir /path/to/output/
+    Option 1 - datasets already registered in dataset_config.yaml:
+        python generate_pseudobulk_dumps.py                      # all datasets
+        python generate_pseudobulk_dumps.py --ds rice            # one dataset
+        python generate_pseudobulk_dumps.py --ds at_root rice    # several datasets
+        python generate_pseudobulk_dumps.py --ds at_flower --outdir /path/to/output/
+
+    Option 2 - any H5AD file, straight from the command line (no YAML editing):
+        python generate_pseudobulk_dumps.py --h5ad lee_2025_at_root.h5ad
+        python generate_pseudobulk_dumps.py --h5ad robertson_2026_rice.h5ad \\
+            --cell-type-col CellAnnotation --cell-type-col2 Condition \\
+            --db-name rice_OW_pseudobulk --outdir ~/dumps
+
+        Defaults for Option 2:
+            --cell-type-col  CellType  (the column rds_to_h5ad.r always writes)
+            --db-name        <h5ad file name>_pseudobulk
+            --cell-type-col2 / --gene-id-col: not used
+            --use-logcounts: off
+
+    Quick test on a single gene (works with both options):
+        python generate_pseudobulk_dumps.py --ds rice -n 1 --no-std
+
+    Available --ds keys:
+        arabidopsis, rice, at_root, at_seed, at_flower, at_silique, at_stem,
+        at_seed_0d_lee, at_rosette_21d_lee, at_shoot_zhang, at_rosette_30d_lee,
+        at_seedling_3d_lee, at_seedling_6d_lee, at_seedling_12d_lee
 
 Dataset-specific notes
 ----------------------
@@ -695,15 +704,82 @@ def write_dump(out_path, db_name, gene_ids, cell_types, avg_matrix, std_matrix,
 # CLI
 # ──────────────────────────────────────────────────────────────────────────────
 
+def build_custom_config(args):
+    """
+    Build a one-off dataset config from command-line arguments, so a new
+    H5AD can be dumped without adding it to dataset_config.yaml first.
+    Returns a dict with the same keys as pseudobulk_columns() returns.
+    """
+    h5ad_path = os.path.expanduser(args.h5ad)
+
+    # Default database name: the H5AD file name + "_pseudobulk"
+    # e.g. lee_2025_at_root.h5ad -> lee_2025_at_root_pseudobulk
+    if args.db_name:
+        db_name = args.db_name
+    else:
+        file_name = os.path.basename(h5ad_path)
+        file_stem = os.path.splitext(file_name)[0]
+        db_name = file_stem + "_pseudobulk"
+
+    config = {
+        "ds_key": "custom",
+        "h5ad": h5ad_path,
+        "cell_type_col": args.cell_type_col,
+        "cell_type_col2": args.cell_type_col2,
+        "gene_id_col": args.gene_id_col,
+        "use_logcounts": args.use_logcounts,
+        "post_process": None,
+        "db_name": db_name,
+    }
+    return config
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate MySQL pseudobulk dump files from H5AD datasets."
     )
+
+    # ── Option 1: registered datasets from dataset_config.yaml ───────────────
     parser.add_argument(
         "--ds",
+        nargs="+",
         choices=_DS_CHOICES + ["all"],
-        default="all",
-        help="Which dataset to process (default: all)",
+        default=["all"],
+        help="One or more registered datasets to process (default: all)",
+    )
+
+    # ── Option 2: any H5AD file, no YAML editing needed ──────────────────────
+    parser.add_argument(
+        "--h5ad",
+        default=None,
+        help="Path to an H5AD file to process directly (ignores --ds)",
+    )
+    parser.add_argument(
+        "--cell-type-col",
+        default="CellType",
+        help="With --h5ad: obs column holding the cell types (default: CellType)",
+    )
+    parser.add_argument(
+        "--cell-type-col2",
+        default=None,
+        help="With --h5ad: optional second obs column (condition/genotype); "
+             "data_bot_id becomes '{col2}_{col1}'",
+    )
+    parser.add_argument(
+        "--gene-id-col",
+        default=None,
+        help="With --h5ad: optional var column holding gene IDs (e.g. TAIR_ID); "
+             "default uses var_names",
+    )
+    parser.add_argument(
+        "--use-logcounts",
+        action="store_true",
+        help="With --h5ad: use the 'logcounts' layer if X is empty",
+    )
+    parser.add_argument(
+        "--db-name",
+        default=None,
+        help="With --h5ad: MySQL database name (default: <file name>_pseudobulk)",
     )
     parser.add_argument(
         "--outdir",
@@ -737,10 +813,19 @@ def main():
     compute_std = not args.no_std
     add_mean_ctrl = not args.no_mean_ctrl
 
-    ds_keys = _DS_CHOICES if args.ds == "all" else [args.ds]
+    # ── Collect the config for every dataset we need to process ──────────────
+    configs = []
+    if args.h5ad:
+        configs.append(build_custom_config(args))
+    elif "all" in args.ds:
+        for ds_key in _DS_CHOICES:
+            configs.append(pseudobulk_columns(ds_key))
+    else:
+        for ds_key in args.ds:
+            configs.append(pseudobulk_columns(ds_key))
 
-    for ds_key in ds_keys:
-        cfg = pseudobulk_columns(ds_key)
+    for cfg in configs:
+        ds_key         = cfg["ds_key"]
         db_name        = cfg["db_name"]
         h5ad_path      = cfg["h5ad"]
         cell_type_col  = cfg["cell_type_col"]

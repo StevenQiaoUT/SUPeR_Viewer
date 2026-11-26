@@ -1,0 +1,15 @@
+# SUPeR Viewer - Python 3.12
+# Main app (main_app/mini_app.py)
+numpy
+scipy
+pandas
+anndata
+plotly
+requests
+flask          # only used for running mini_app.py locally (imported lazily)
+
+# Config loading (dataset_config/dataset_config.py)
+PyYAML
+
+# Preprocessing (h5ad_manipulation/log_normalize.py)
+scanpy

@@ -46,9 +46,27 @@ the SVG can find matching points in the UMAP via a plain string match.
         generate_pseudobulk_dumps.py.
 
 Usage:
-    python3 generate_umap_dumps.py
-    python3 generate_umap_dumps.py --datasets rice arabidopsis_nat
-    python3 generate_umap_dumps.py --max-cells 5000 --out-dir /tmp/umap_dumps
+    Option 1 - datasets already registered in dataset_config.yaml:
+        python3 generate_umap_dumps.py                                  # all datasets
+        python3 generate_umap_dumps.py --datasets rice arabidopsis_nat
+        python3 generate_umap_dumps.py --max-cells 5000 --out-dir /tmp/umap_dumps
+
+    Option 2 - any H5AD file, straight from the command line (no YAML editing):
+        python3 generate_umap_dumps.py --h5ad lee_2025_at_root.h5ad
+        python3 generate_umap_dumps.py --h5ad robertson_2026_rice.h5ad \\
+            --umap-col CellAnnotation --umap-col2 Condition \\
+            --db-name rice_OW_umap --max-cells 15000
+
+        Defaults for Option 2:
+            --umap-col  CellType  (the column rds_to_h5ad.r always writes)
+            --db-name   <h5ad file name>_umap
+            --umap-col2 / --gene-id-col: not used
+        The H5AD must contain obsm['X_umap'] (rds_to_h5ad.r writes this).
+
+    Quick test on a couple of genes (works with both options):
+        python3 generate_umap_dumps.py --datasets rice --genes LOC_Os01g01010 LOC_Os01g01019
+
+    --outdir is accepted as another spelling of --out-dir.
 
 Output:
     One .sql file per dataset in --out-dir (default: ./umap_dumps/)
@@ -453,14 +471,68 @@ def write_dump(
 # CLI
 # ---------------------------------------------------------------------------
 
+def build_custom_config(args) -> dict:
+    """
+    Build a one-off dataset config from command-line arguments, so a new
+    H5AD can be dumped without adding it to dataset_config.yaml first.
+    Returns a dict with the same keys as umap_columns() returns.
+    """
+    h5ad_path = os.path.expanduser(args.h5ad)
+
+    # Default database name: the H5AD file name + "_umap"
+    # e.g. lee_2025_at_root.h5ad -> lee_2025_at_root_umap
+    if args.db_name:
+        db_name = args.db_name
+    else:
+        file_name = os.path.basename(h5ad_path)
+        file_stem = os.path.splitext(file_name)[0]
+        db_name = file_stem + "_umap"
+
+    config = {
+        "ds_key": "custom",
+        "h5ad": h5ad_path,
+        "umap_col": args.umap_col,
+        "umap_col2": args.umap_col2,
+        "gene_id_col": args.gene_id_col,
+        "db_name": db_name,
+    }
+    return config
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate two-table UMAP SQL dumps from H5AD files for BAR API",
     )
+
+    # ── Option 1: registered datasets from dataset_config.yaml ───────────────
     parser.add_argument(
         "--datasets", nargs="+", choices=list(DATASETS.keys()),
         default=list(DATASETS.keys()),
-        help="Which datasets to process (default: all)",
+        help="Which registered datasets to process (default: all)",
+    )
+
+    # ── Option 2: any H5AD file, no YAML editing needed ──────────────────────
+    parser.add_argument(
+        "--h5ad", default=None,
+        help="Path to an H5AD file to process directly (ignores --datasets)",
+    )
+    parser.add_argument(
+        "--umap-col", default="CellType",
+        help="With --h5ad: obs column used to label UMAP points (default: CellType)",
+    )
+    parser.add_argument(
+        "--umap-col2", default=None,
+        help="With --h5ad: optional second obs column (condition/genotype); "
+             "cell_type becomes '{col2}_{col1}'",
+    )
+    parser.add_argument(
+        "--gene-id-col", default=None,
+        help="With --h5ad: optional var column holding gene IDs (e.g. TAIR_ID); "
+             "default uses var_names",
+    )
+    parser.add_argument(
+        "--db-name", default=None,
+        help="With --h5ad: MySQL database name (default: <file name>_umap)",
     )
     parser.add_argument(
         "--genes", nargs="+", default=None, metavar="GENE_ID",
@@ -475,7 +547,7 @@ def main() -> None:
         help="Rows per INSERT statement (default: 1000)",
     )
     parser.add_argument(
-        "--out-dir", default="umap_dumps", metavar="DIR",
+        "--out-dir", "--outdir", dest="out_dir", default="umap_dumps", metavar="DIR",
         help="Output directory (default: ./umap_dumps/)",
     )
     parser.add_argument(
@@ -494,8 +566,16 @@ def main() -> None:
             file=sys.stderr,
         )
 
-    for ds_key in args.datasets:
-        cfg = DATASETS[ds_key]
+    # ── Collect the config for every dataset we need to process ──────────────
+    configs = []
+    if args.h5ad:
+        configs.append(build_custom_config(args))
+    else:
+        for ds_key in args.datasets:
+            configs.append(DATASETS[ds_key])
+
+    for cfg in configs:
+        ds_key = cfg["ds_key"]
         if not os.path.exists(cfg["h5ad"]):
             print(f"[skip] {ds_key}: H5AD not found at {cfg['h5ad']}", file=sys.stderr)
             continue
@@ -516,3 +596,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
